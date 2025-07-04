@@ -27,8 +27,8 @@ export async function onRequest(context) {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Check if we have DB_LATIHAN1
-  if (!env.DB_LATIHAN1) {
+  // Check if we have DB_PSIKOLOGI
+  if (!env.DB_PSIKOLOGI) {
     console.error('Database not available');
     return new Response(JSON.stringify({ error: 'Database not available' }), {
       status: 500,
@@ -57,11 +57,11 @@ export async function onRequest(context) {
 
   try {
     if (method === 'GET') {
-      return await handleGetSingle(env.DB_LATIHAN1, tableName, id, corsHeaders);
+      return await handleGetSingle(env.DB_PSIKOLOGI, tableName, id, corsHeaders);
     } else if (method === 'PUT') {
-      return await handleUpdate(request, env.DB_LATIHAN1, tableName, id, corsHeaders);
+      return await handleUpdate(request, env.DB_PSIKOLOGI, tableName, id, corsHeaders);
     } else if (method === 'DELETE') {
-      return await handleDelete(env.DB_LATIHAN1, tableName, id, corsHeaders);
+      return await handleDelete(env.DB_PSIKOLOGI, tableName, id, corsHeaders);
     } else {
       console.log('Method not allowed:', method);
       return new Response(JSON.stringify({ error: `Method ${method} not allowed` }), {
@@ -87,7 +87,7 @@ function isValidTableName(tableName) {
 }
 
 // Function to create table if not exists
-async function createTableIfNotExists(DB_LATIHAN1, tableName) {
+async function createTableIfNotExists(DB_PSIKOLOGI, tableName) {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS ${tableName} (
       id_x INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -114,27 +114,27 @@ async function createTableIfNotExists(DB_LATIHAN1, tableName) {
     )
   `;
   
-  await DB_LATIHAN1.prepare(createTableQuery).run();
+  await DB_PSIKOLOGI.prepare(createTableQuery).run();
   console.log(`Table '${tableName}' created or already exists`);
 }
 
 // GET single record by id_x - Dynamic table version with auto-create
-async function handleGetSingle(DB_LATIHAN1, tableName, id, corsHeaders) {
+async function handleGetSingle(DB_PSIKOLOGI, tableName, id, corsHeaders) {
   console.log(`--- GET single record from ${tableName} with id_x ${id} ---`);
   
   try {
     // Check if table exists first
-    const tableCheck = await DB_LATIHAN1.prepare(`
+    const tableCheck = await DB_PSIKOLOGI.prepare(`
       SELECT name FROM sqlite_master WHERE type='table' AND name=?
     `).bind(tableName).first();
     
     if (!tableCheck) {
       console.log(`Table '${tableName}' does not exist, creating...`);
-      await createTableIfNotExists(DB_LATIHAN1, tableName);
+      await createTableIfNotExists(DB_PSIKOLOGI, tableName);
     }
     
     const query = `SELECT * FROM ${tableName} WHERE id_x = ?`;
-    const result = await DB_LATIHAN1.prepare(query).bind(id).first();
+    const result = await DB_PSIKOLOGI.prepare(query).bind(id).first();
     console.log('Get single result:', result);
 
     if (!result) {
@@ -167,18 +167,18 @@ async function handleGetSingle(DB_LATIHAN1, tableName, id, corsHeaders) {
 }
 
 // UPDATE record by id_x - Dynamic table version with auto-create
-async function handleUpdate(request, DB_LATIHAN1, tableName, id, corsHeaders) {
+async function handleUpdate(request, DB_PSIKOLOGI, tableName, id, corsHeaders) {
   console.log(`--- UPDATE record ${id} in table ${tableName} ---`);
   
   try {
     // Check if table exists first
-    const tableCheck = await DB_LATIHAN1.prepare(`
+    const tableCheck = await DB_PSIKOLOGI.prepare(`
       SELECT name FROM sqlite_master WHERE type='table' AND name=?
     `).bind(tableName).first();
     
     if (!tableCheck) {
       console.log(`Table '${tableName}' does not exist, creating...`);
-      await createTableIfNotExists(DB_LATIHAN1, tableName);
+      await createTableIfNotExists(DB_PSIKOLOGI, tableName);
     }
     
     // Get request body
@@ -198,7 +198,7 @@ async function handleUpdate(request, DB_LATIHAN1, tableName, id, corsHeaders) {
     // Check if record exists first using id_x
     console.log('Checking if record exists...');
     const existsQuery = `SELECT id_x FROM ${tableName} WHERE id_x = ?`;
-    const existsResult = await DB_LATIHAN1.prepare(existsQuery).bind(id).first();
+    const existsResult = await DB_PSIKOLOGI.prepare(existsQuery).bind(id).first();
     console.log('Exists check result:', existsResult);
 
     if (!existsResult) {
@@ -238,7 +238,7 @@ async function handleUpdate(request, DB_LATIHAN1, tableName, id, corsHeaders) {
     console.log('Update query:', updateQuery);
     console.log('Update values:', updateValues);
     
-    const updateResult = await DB_LATIHAN1.prepare(updateQuery).bind(...updateValues).run();
+    const updateResult = await DB_PSIKOLOGI.prepare(updateQuery).bind(...updateValues).run();
     console.log('Update result:', updateResult);
 
     return new Response(JSON.stringify({ 
@@ -265,24 +265,24 @@ async function handleUpdate(request, DB_LATIHAN1, tableName, id, corsHeaders) {
 }
 
 // DELETE record by id_x - Dynamic table version with auto-create
-async function handleDelete(DB_LATIHAN1, tableName, id, corsHeaders) {
+async function handleDelete(DB_PSIKOLOGI, tableName, id, corsHeaders) {
   console.log(`--- DELETE record ${id} from table ${tableName} ---`);
   
   try {
     // Check if table exists first
-    const tableCheck = await DB_LATIHAN1.prepare(`
+    const tableCheck = await DB_PSIKOLOGI.prepare(`
       SELECT name FROM sqlite_master WHERE type='table' AND name=?
     `).bind(tableName).first();
     
     if (!tableCheck) {
       console.log(`Table '${tableName}' does not exist, creating...`);
-      await createTableIfNotExists(DB_LATIHAN1, tableName);
+      await createTableIfNotExists(DB_PSIKOLOGI, tableName);
     }
     
     // Check if record exists first using id_x
     console.log('Checking if record exists...');
     const existsQuery = `SELECT id_x, x_01, x_02, x_03 FROM ${tableName} WHERE id_x = ?`;
-    const existsResult = await DB_LATIHAN1.prepare(existsQuery).bind(id).first();
+    const existsResult = await DB_PSIKOLOGI.prepare(existsQuery).bind(id).first();
     console.log('Exists check result:', existsResult);
 
     if (!existsResult) {
@@ -297,7 +297,7 @@ async function handleDelete(DB_LATIHAN1, tableName, id, corsHeaders) {
     // Delete record using id_x
     console.log('Deleting record...');
     const deleteQuery = `DELETE FROM ${tableName} WHERE id_x = ?`;
-    const deleteResult = await DB_LATIHAN1.prepare(deleteQuery).bind(id).run();
+    const deleteResult = await DB_PSIKOLOGI.prepare(deleteQuery).bind(id).run();
     console.log('Delete result:', deleteResult);
 
     return new Response(JSON.stringify({ 
