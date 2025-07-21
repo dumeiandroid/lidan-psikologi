@@ -60,13 +60,11 @@ body {
     text-align: center;
     padding-top: 5rem; /* Adjust for fixed navbar */
 
-    /* Background image with overlay */
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://lidan-psikologi.my.id/gambar/hero-1.jpg');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    overflow: hidden; /* Pastikan konten tetap di dalam batas */
-    /* Removed animation: gradientAnimation as it's no longer a gradient background */
+    /* Animated Gradient Background - Adjusted colors to match the sunset/sunrise image */
+    background: linear-gradient(135deg, #4A2707, #A15E0F, #8A3904, #3B1700, #AB5B2A); /* Coral, Gold, Light Salmon */
+    background-size: 400% 400%; /* Larger background size for animation effect */
+    animation: gradientAnimation 20s ease infinite alternate; /* Gradient animation with longer duration, alternating */
+    overflow: hidden; /* Ensure gradient stays within bounds */
 }
 
 /* Pseudo-element for subtle floating particles/lights */
@@ -77,10 +75,10 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%); /* Cahaya lembut */
-    animation: subtleFloat 25s ease-in-out infinite alternate; /* Animasi melayang yang halus */
-    pointer-events: none; /* Pastikan tidak mengganggu interaksi */
-    z-index: 1; /* Di atas latar belakang gambar, di bawah konten teks */
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%); /* Soft light */
+    animation: subtleFloat 25s ease-in-out infinite alternate; /* Subtle floating animation */
+    pointer-events: none; /* Ensure no interaction interference */
+    z-index: 1; /* Above background, below text content */
 }
 
 /* Ensure content inside masthead is above the pseudo-element */
@@ -543,46 +541,51 @@ footer .social-links a:hover {
     100% { transform: translateY(0px); }
 }
 
-/* New keyframes for gradient animation - Re-added */
+/* New keyframes for gradient animation - Re-added and adjusted colors */
 @keyframes gradientAnimation {
     0% {
         background-position: 0% 0%;
+        background-color: #FF7F50; /* Coral */
     }
     25% {
         background-position: 100% 0%;
+        background-color: #FFD700; /* Gold */
     }
     50% {
         background-position: 100% 100%;
+        background-color: #FFA07A; /* Light Salmon */
     }
     75% {
         background-position: 0% 100%;
+        background-color: #FFD700; /* Gold */
     }
     100% {
         background-position: 0% 0%;
+        background-color: #FF7F50; /* Coral */
     }
 }
 
 /* New keyframes for subtle floating effect */
-@keyframes subtleFloat {
+@keyframes gradientAnimation {
     0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 0.8;
+        background-position: 0% 0%;
+        background-color: #AB5B2A; /* Coral */
     }
     25% {
-        transform: translate(10%, 5%) scale(1.05);
-        opacity: 0.9;
+        background-position: 100% 0%;
+        background-color: #A15E0F; /* Gold */
     }
     50% {
-        transform: translate(0, 10%) scale(1);
-        opacity: 0.8;
+        background-position: 100% 100%;
+        background-color: #4A2707; /* Light Salmon */
     }
     75% {
-        transform: translate(-10%, 5%) scale(0.95);
-        opacity: 0.7;
+        background-position: 0% 100%;
+        background-color: #A15E0F; /* Gold */
     }
     100% {
-        transform: translate(0, 0) scale(1);
-        opacity: 0.8;
+        background-position: 0% 0%;
+        background-color: #FF7F50; /* Coral */
     }
 }
 
