@@ -46,65 +46,77 @@ body {
 #mainNav .navbar-nav .nav-item .nav-link:hover {
     color: var(--primary);
 }
+
 /* Hero Section (Masthead) */
 .masthead {
     position: relative;
     width: 100%;
     height: 100vh;
     min-height: 400px;
-    background: url('https://lidan-psikologi.my.id/gambar/hero-1.jpg') no-repeat center center;
-    background-size: cover;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     text-align: center;
     padding-top: 5rem; /* Adjust for fixed navbar */
+
+    /* Animated Gradient Background */
+    background: linear-gradient(135deg, var(--primary), #17a2b8, #20c997, #17a2b8, var(--primary)); /* Gradien dengan lebih banyak warna dan sudut */
+    background-size: 400% 400%; /* Ukuran background yang lebih besar untuk efek animasi */
+    animation: gradientAnimation 20s ease infinite alternate; /* Animasi gradien dengan durasi lebih panjang, bolak-balik */
+    overflow: hidden; /* Pastikan gradien tetap di dalam batas */
 }
 
-.masthead::before {
+/* Pseudo-element for subtle floating particles/lights */
+.masthead::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.55); /* Biarkan overlay seperti aslinya */
-    z-index: 1; /* Pastikan overlay berada di bawah text */
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%); /* Cahaya lembut */
+    animation: subtleFloat 25s ease-in-out infinite alternate; /* Animasi melayang yang halus */
+    pointer-events: none; /* Pastikan tidak mengganggu interaksi */
+    z-index: 1; /* Di atas gradien, di bawah konten teks */
+}
+
+/* Ensure content inside masthead is above the pseudo-element */
+.masthead > .container-fluid > .row > div {
+    position: relative;
+    z-index: 2; /* Ensure content is above the pseudo-element */
+}
+
+/* Specific styling for the split hero image container */
+.masthead-img-container {
+    height: 100%; /* Ensure it takes full height of its column */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem; /* Add padding for spacing */
+}
+
+.masthead-img-container img {
+    max-height: 80%; /* Adjust image size within the container */
+    max-width: 90%;
+    object-fit: contain;
+    border-radius: 0.75rem; /* Apply rounded corners to the image */
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175); /* Add shadow to the image */
 }
 
 .masthead h1 {
-    position: relative;
-    z-index: 10; /* Z-index tinggi agar berada di atas overlay */
     font-size: 3.5rem;
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 1rem;
-    color: white !important;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6); /* Stronger text shadow */
 }
 
 .masthead p {
-    position: relative;
-    z-index: 10; /* Z-index tinggi agar berada di atas overlay */
     font-size: 1.25rem;
     font-weight: 300;
     max-width: 800px;
     margin: 0 auto 2rem;
-    color: rgba(255, 255, 255, 0.9) !important;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
-}
-
-/* Pastikan semua elemen dalam masthead memiliki z-index yang tepat */
-.masthead .container {
-    position: relative;
-    z-index: 10; /* Z-index tinggi untuk container */
-}
-
-/* Tambahan untuk memastikan button juga terlihat */
-.masthead .btn {
-    position: relative;
-    z-index: 10; /* Z-index tinggi untuk button */
 }
 
 /* General Section Styling */
@@ -386,6 +398,14 @@ footer .social-links a:hover {
 }
 
 @media (max-width: 768px) {
+    .masthead {
+        /* Adjust height for mobile hero to prevent excessive scrolling */
+        height: auto;
+        min-height: unset; /* Remove min-height constraint for mobile */
+        padding-top: 3rem; /* Reduce top padding for mobile */
+        padding-bottom: 3rem; /* Add bottom padding for mobile */
+    }
+
     .masthead h1 {
         font-size: 2.5rem;
     }
@@ -410,6 +430,22 @@ footer .social-links a:hover {
     .package-card {
         margin-bottom: 1.5rem;
     }
+    /* Ensure the image column is always displayed on mobile */
+    .masthead .col-lg-6.d-none.d-lg-flex {
+        display: flex !important; /* Mengubah dari 'none' menjadi 'flex' */
+        height: auto; /* Mengatur tinggi otomatis untuk konten yang menumpuk */
+        padding: 2rem; /* Menambahkan padding agar tidak terlalu mepet */
+        order: 2; /* Ensure image comes after text on mobile */
+    }
+    /* Ensure the text content takes full width and comes first on mobile */
+    .masthead .col-lg-6.d-flex {
+        width: 100%;
+        order: 1; /* Ensure text comes first on mobile */
+        padding: 2rem; /* Add padding for text content on mobile */
+    }
+    .masthead .row {
+        flex-direction: column; /* Stack columns vertically on mobile */
+    }
 }
 
 /* ANIMASI BARU UNTUK GAMBAR */
@@ -428,6 +464,49 @@ footer .social-links a:hover {
     0% { transform: translateY(0px); }
     50% { transform: translateY(-10px); } /* Bergerak naik 10px */
     100% { transform: translateY(0px); }
+}
+
+/* New keyframes for gradient animation - more dynamic */
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 0%;
+    }
+    25% {
+        background-position: 100% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    75% {
+        background-position: 0% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+/* New keyframes for subtle floating effect */
+@keyframes subtleFloat {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+    25% {
+        transform: translate(10%, 5%) scale(1.05);
+        opacity: 0.9;
+    }
+    50% {
+        transform: translate(0, 10%) scale(1);
+        opacity: 0.8;
+    }
+    75% {
+        transform: translate(-10%, 5%) scale(0.95);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
 }
 
 /* Gaya dasar untuk gambar yang akan dianimasikan */
