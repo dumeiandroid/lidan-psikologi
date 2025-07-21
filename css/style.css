@@ -60,11 +60,13 @@ body {
     text-align: center;
     padding-top: 5rem; /* Adjust for fixed navbar */
 
-    /* Animated Gradient Background - Reverted to previous state */
-    background: linear-gradient(135deg, var(--primary), #17a2b8, #20c997, #17a2b8, var(--primary)); /* Gradien dengan lebih banyak warna dan sudut */
-    background-size: 400% 400%; /* Ukuran background yang lebih besar untuk efek animasi */
-    animation: gradientAnimation 20s ease infinite alternate; /* Animasi gradien dengan durasi lebih panjang, bolak-balik */
-    overflow: hidden; /* Pastikan gradien tetap di dalam batas */
+    /* Background image with overlay */
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://lidan-psikologi.my.id/gambar/hero-1.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    overflow: hidden; /* Pastikan konten tetap di dalam batas */
+    /* Removed animation: gradientAnimation as it's no longer a gradient background */
 }
 
 /* Pseudo-element for subtle floating particles/lights */
@@ -78,7 +80,7 @@ body {
     background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%); /* Cahaya lembut */
     animation: subtleFloat 25s ease-in-out infinite alternate; /* Animasi melayang yang halus */
     pointer-events: none; /* Pastikan tidak mengganggu interaksi */
-    z-index: 1; /* Di atas latar belakang, di bawah konten teks */
+    z-index: 1; /* Di atas latar belakang gambar, di bawah konten teks */
 }
 
 /* Ensure content inside masthead is above the pseudo-element */
@@ -387,7 +389,7 @@ footer .social-links a:hover {
     bottom: 20px; /* Kembali ke posisi bawah */
     left: 50%;
     transform: translateX(-50%); /* Center the button horizontally */
-    background-color: #25d366; /* Warna hijau seperti WhatsApp */
+    background-color: #8B4513; /* Warna coklat */
     color: #FFF; /* Warna teks putih */
     padding: 12px 25px;
     border-radius: 50px;
@@ -401,7 +403,7 @@ footer .social-links a:hover {
 }
 
 .floating-coba-gratis-btn:hover {
-    background-color: #128C7E; /* Darker green on hover */
+    background-color: #654321; /* Coklat lebih gelap saat di-hover */
     transform: translateX(-50%) scale(1.05); /* Scale on hover */
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     animation: none; /* Hentikan kedip saat di-hover */
@@ -586,8 +588,8 @@ footer .social-links a:hover {
 
 /* Keyframes for blinking background effect */
 @keyframes blink-background {
-    0%, 100% { background-color: #25d366; box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3); }
-    50% { background-color: #128C7E; box-shadow: 0 0 15px rgba(37, 211, 102, 0.7); } /* Darker green, subtle glow */
+    0%, 100% { background-color: #8B4513; box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3); } /* Coklat awal */
+    50% { background-color: #654321; box-shadow: 0 0 15px rgba(139, 69, 19, 0.7); } /* Coklat lebih gelap, glow coklat */
 }
 
 /* Gaya dasar untuk gambar yang akan dianimasikan */
