@@ -45,6 +45,28 @@ window.addEventListener('load', async () => {
     if (!response.success) {
         console.warn('Gagal mencatat kunjungan:', response.message);
     }
+
+    // Show popup after 5 seconds on page load
+    const popupGratis = document.getElementById('popupGratis');
+    const closePopupBtn = document.getElementById('closePopup');
+
+    if (popupGratis && closePopupBtn) {
+        setTimeout(() => {
+            popupGratis.classList.add('show');
+        }, 5000); // 5000 milliseconds = 5 seconds
+
+        // Close popup when close button is clicked
+        closePopupBtn.addEventListener('click', () => {
+            popupGratis.classList.remove('show');
+        });
+
+        // Close popup when clicking outside the content
+        popupGratis.addEventListener('click', (event) => {
+            if (event.target === popupGratis) {
+                popupGratis.classList.remove('show');
+            }
+        });
+    }
 });
 
 // 2. Handle Contact Form Submission
