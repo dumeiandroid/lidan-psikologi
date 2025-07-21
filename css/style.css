@@ -46,7 +46,6 @@ body {
 #mainNav .navbar-nav .nav-item .nav-link:hover {
     color: var(--primary);
 }
-
 /* Hero Section (Masthead) */
 .masthead {
     position: relative;
@@ -70,22 +69,42 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.55); /* Slightly darker overlay for contrast */
+    background: rgba(0, 0, 0, 0.55); /* Biarkan overlay seperti aslinya */
+    z-index: 1; /* Pastikan overlay berada di bawah text */
 }
 
 .masthead h1 {
+    position: relative;
+    z-index: 10; /* Z-index tinggi agar berada di atas overlay */
     font-size: 3.5rem;
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 1rem;
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6); /* Stronger text shadow */
+    color: white !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
 }
 
 .masthead p {
+    position: relative;
+    z-index: 10; /* Z-index tinggi agar berada di atas overlay */
     font-size: 1.25rem;
     font-weight: 300;
     max-width: 800px;
     margin: 0 auto 2rem;
+    color: rgba(255, 255, 255, 0.9) !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Pastikan semua elemen dalam masthead memiliki z-index yang tepat */
+.masthead .container {
+    position: relative;
+    z-index: 10; /* Z-index tinggi untuk container */
+}
+
+/* Tambahan untuk memastikan button juga terlihat */
+.masthead .btn {
+    position: relative;
+    z-index: 10; /* Z-index tinggi untuk button */
 }
 
 /* General Section Styling */
