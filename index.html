@@ -54,19 +54,25 @@
         </div>
     </nav>
 
-    <!-- Hero Section - Split Hero Layout -->
+    <!-- Hero Section - Split Hero Layout with reorderable content -->
     <header class="masthead bg-primary text-white" id="page-top">
         <div class="container-fluid h-100">
             <div class="row h-100 align-items-center">
-                <div class="col-lg-6 d-flex align-items-center justify-content-center text-center text-lg-start p-5">
-                    <div>
+                <!-- Left Column for Text Content on Desktop -->
+                <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center text-center text-lg-start p-5 order-lg-1 hero-left-content">
+                    <!-- Title Part -->
+                    <div class="hero-title-part">
                         <h1 class="text-uppercase font-weight-bold">Merasa Terbebani?</h1>
                         <hr class="divider light my-4" />
+                    </div>
+                    <!-- Description and Button Part -->
+                    <div class="hero-description-button-part mt-auto mt-lg-0">
                         <p class="text-white-75 mb-5">Kehidupan modern seringkali membawa tekanan yang tak terlihat. Jika Anda merasa cemas, stres, atau kehilangan arah, Lidan Psikologi siap mendampingi Anda.</p>
                         <a class="btn btn-light btn-xl" href="#masalah">Pelajari Lebih Lanjut</a>
                     </div>
                 </div>
-                <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center masthead-img-container">
+                <!-- Right Column for Image on Desktop -->
+                <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center masthead-img-container order-lg-2 hero-image-col">
                     <img src="https://lidan-psikologi.my.id/gambar/hero-1.jpg" alt="[Seseorang sedang berkonsultasi dengan psikolog]" class="img-fluid rounded shadow-lg animate-float img-fade-in" data-float="true">
                 </div>
             </div>
@@ -496,7 +502,7 @@
             <hr class="divider my-4" />
             <div class="embed-responsive embed-responsive-16by9 rounded-4 shadow-lg mx-auto" style="max-width: 800px;">
 
-                
+
                 <div class="ratio ratio-16x9 rounded-3 shadow-lg">
                     <iframe src="https://www.youtube.com/embed/4tPQrHLjJDg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
@@ -588,6 +594,9 @@
     <a href="https://wa.me/6285159601400" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
+
+    <!-- Floating "Coba Gratis" Button -->
+    <a href="#paket" class="floating-coba-gratis-btn">Coba Gratis</a>
 
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

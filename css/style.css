@@ -60,7 +60,7 @@ body {
     text-align: center;
     padding-top: 5rem; /* Adjust for fixed navbar */
 
-    /* Animated Gradient Background */
+    /* Animated Gradient Background - Reverted to previous state */
     background: linear-gradient(135deg, var(--primary), #17a2b8, #20c997, #17a2b8, var(--primary)); /* Gradien dengan lebih banyak warna dan sudut */
     background-size: 400% 400%; /* Ukuran background yang lebih besar untuk efek animasi */
     animation: gradientAnimation 20s ease infinite alternate; /* Animasi gradien dengan durasi lebih panjang, bolak-balik */
@@ -78,7 +78,7 @@ body {
     background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%); /* Cahaya lembut */
     animation: subtleFloat 25s ease-in-out infinite alternate; /* Animasi melayang yang halus */
     pointer-events: none; /* Pastikan tidak mengganggu interaksi */
-    z-index: 1; /* Di atas gradien, di bawah konten teks */
+    z-index: 1; /* Di atas latar belakang, di bawah konten teks */
 }
 
 /* Ensure content inside masthead is above the pseudo-element */
@@ -381,6 +381,33 @@ footer .social-links a:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
+/* Floating "Coba Gratis" Button */
+.floating-coba-gratis-btn {
+    position: fixed;
+    bottom: 20px; /* Kembali ke posisi bawah */
+    left: 50%;
+    transform: translateX(-50%); /* Center the button horizontally */
+    background-color: #25d366; /* Warna hijau seperti WhatsApp */
+    color: #FFF; /* Warna teks putih */
+    padding: 12px 25px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3); /* Slightly darker shadow for contrast */
+    z-index: 999; /* Di atas konten lain, di bawah WhatsApp */
+    animation: blink-background 1s infinite alternate; /* Animasi berkedip pada background */
+    transition: all 0.3s ease;
+}
+
+.floating-coba-gratis-btn:hover {
+    background-color: #128C7E; /* Darker green on hover */
+    transform: translateX(-50%) scale(1.05); /* Scale on hover */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    animation: none; /* Hentikan kedip saat di-hover */
+}
+
+
 /* Responsive Adjustments */
 @media (min-width: 992px) {
     .masthead {
@@ -394,6 +421,25 @@ footer .social-links a:hover {
     }
     .page-section {
         padding: 8rem 0; /* Mengembalikan padding untuk desktop agar tidak terlalu sempit */
+    }
+    /* Desktop specific ordering for hero columns */
+    .hero-left-content {
+        order: 1; /* Left content (title, description, button) on left */
+        text-align: left !important; /* Ensure text alignment is left on desktop */
+        align-items: flex-start !important; /* Align items to start for left column */
+    }
+    .hero-image-col {
+        order: 2; /* Image on right */
+        display: flex !important; /* Ensure image is visible on desktop */
+    }
+    /* Reset padding for desktop */
+    .hero-title-part,
+    .hero-description-button-part {
+        padding: 0;
+    }
+    /* Adjust margin for description part on desktop */
+    .hero-description-button-part {
+        margin-top: 2rem !important; /* Add some space between title and description on desktop */
     }
 }
 
@@ -430,21 +476,50 @@ footer .social-links a:hover {
     .package-card {
         margin-bottom: 1.5rem;
     }
-    /* Ensure the image column is always displayed on mobile */
-    .masthead .col-lg-6.d-none.d-lg-flex {
-        display: flex !important; /* Mengubah dari 'none' menjadi 'flex' */
-        height: auto; /* Mengatur tinggi otomatis untuk konten yang menumpuk */
-        padding: 2rem; /* Menambahkan padding agar tidak terlalu mepet */
-        order: 2; /* Ensure image comes after text on mobile */
-    }
-    /* Ensure the text content takes full width and comes first on mobile */
-    .masthead .col-lg-6.d-flex {
-        width: 100%;
-        order: 1; /* Ensure text comes first on mobile */
-        padding: 2rem; /* Add padding for text content on mobile */
-    }
+
+    /* Mobile specific ordering for hero columns */
     .masthead .row {
         flex-direction: column; /* Stack columns vertically on mobile */
+    }
+
+    .hero-left-content {
+        width: 100%; /* Ensure full width on mobile */
+        padding: 2rem; /* Add padding for text content on mobile */
+        text-align: center !important; /* Center text on mobile */
+        align-items: center !important; /* Center items for mobile */
+    }
+
+    .hero-title-part {
+        order: 1; /* Title first */
+        padding-bottom: 0; /* Remove bottom padding to reduce gap with image */
+    }
+
+    .hero-image-col {
+        display: flex !important; /* Make image visible on mobile */
+        order: 2; /* Image second */
+        width: 100%; /* Ensure full width on mobile */
+        height: auto; /* Allow image height to adjust */
+        padding-top: 1rem; /* Adjust top padding for spacing from title */
+        padding-bottom: 1rem; /* Adjust bottom padding for spacing to description */
+    }
+
+    .hero-description-button-part {
+        order: 3; /* Description and button third */
+        padding-top: 0; /* Remove top padding to reduce gap with image */
+        margin-top: 1rem !important; /* Add some space between image and description on mobile */
+    }
+
+    /* Adjust floating buttons for mobile to prevent overlap */
+    .whatsapp-float {
+        right: 10px; /* Move WhatsApp button slightly to the left */
+        bottom: 80px; /* Move WhatsApp button up to avoid overlap with new button */
+    }
+
+    .floating-coba-gratis-btn {
+        bottom: 20px; /* Keep new button at the very bottom */
+        top: unset; /* Remove top positioning */
+        font-size: 0.9rem; /* Slightly smaller font for mobile */
+        padding: 10px 20px; /* Adjust padding for mobile */
     }
 }
 
@@ -466,7 +541,7 @@ footer .social-links a:hover {
     100% { transform: translateY(0px); }
 }
 
-/* New keyframes for gradient animation - more dynamic */
+/* New keyframes for gradient animation - Re-added */
 @keyframes gradientAnimation {
     0% {
         background-position: 0% 0%;
@@ -507,6 +582,12 @@ footer .social-links a:hover {
         transform: translate(0, 0) scale(1);
         opacity: 0.8;
     }
+}
+
+/* Keyframes for blinking background effect */
+@keyframes blink-background {
+    0%, 100% { background-color: #25d366; box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3); }
+    50% { background-color: #128C7E; box-shadow: 0 0 15px rgba(37, 211, 102, 0.7); } /* Darker green, subtle glow */
 }
 
 /* Gaya dasar untuk gambar yang akan dianimasikan */
