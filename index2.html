@@ -3,245 +3,627 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRUD Data Management</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .table-responsive{max-height:70vh;overflow-y:auto}
-        .btn-sm{padding:.25rem .5rem;font-size:.875rem}
-        .form-control-sm{padding:.25rem .5rem;font-size:.875rem}
-        .modal-body{max-height:60vh;overflow-y:auto}
-    </style>
+    <meta name="description" content="Lidan Psikologi - Pahami karakter bawaan unik anak Anda untuk pola asuh yang lebih efektif. Temukan cara terbaik mendukung perkembangan emosi dan sosial mereka.">
+    <meta name="keywords" content="Lidan Psikologi, PT Lidan Indah Abadi, karakter anak, temperamen anak, pola asuh, perkembangan anak, emosi anak, sosial anak, tantrum, komunikasi anak, bimbingan orang tua, Regus Forum Nine Medan">
+    <meta name="author" content="Lidan Psikologi">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Lidan Psikologi - Pahami Karakter Unik Anak untuk Pola Asuh Terbaik">
+    <meta property="og:description" content="Lidan Psikologi - Pahami karakter bawaan unik anak Anda untuk pola asuh yang lebih efektif. Temukan cara terbaik mendukung perkembangan emosi dan sosial mereka.">
+    <meta property="og:image" content="https://lidan-psikologi.my.id/gambar/logo-psikologi.png">
+    <meta property="og:url" content="https://lidan-psikologi.my.id/temperamen-anak">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lidan Psikologi - Pahami Karakter Unik Anak untuk Pola Asuh Terbaik">
+    <meta name="twitter:description" content="Lidan Psikologi - Pahami karakter bawaan unik anak Anda untuk pola asuh yang lebih efektif. Temukan cara terbaik mendukung perkembangan emosi dan sosial mereka.">
+    <meta name="twitter:image" content="https://lidan-psikologi.my.id/gambar/logo-psikologi.png">
+    <title>Lidan Psikologi - Pahami Karakter Unik Anak untuk Pola Asuh Terbaik</title>
+    <link rel="icon" href="https://lidan-psikologi.my.id/gambar/favicon.ico" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-light">
-    <div class="container-fluid py-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="card shadow">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0"><i class="fas fa-database me-2"></i>Data Management - <span id="tableName">data_latihan</span></h4><p> (masukkan format ?tabel=)</p>
-                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-                            <i class="fas fa-plus me-1"></i>Tambah Data
-                        </button>
+<body>
+
+    <!-- Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="#page-top">
+                <img src="https://lidan-psikologi.my.id/gambar/logo-psikologi.png" alt="[Logo Lidan Psikologi]" class="logo-navbar">
+                <span class="ms-2 fw-bold text-primary">Lidan Psikologi</span>
+            </a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto my-2 my-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="#masalah">Tantangan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#solusi">Jalan Keluar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#layanan">Layanan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#psikolog">Tim Kami</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#fasilitas">Fasilitas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#paket">Paket</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section - Split Hero Layout with reorderable content -->
+    <header class="masthead bg-primary text-white" id="page-top">
+        <div class="container-fluid h-100">
+            <div class="row h-100 align-items-center">
+                <!-- Left Column for Text Content on Desktop -->
+                <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center text-center text-lg-start p-5 order-lg-1 hero-left-content">
+                    <!-- Title Part -->
+                    <div class="hero-title-part">
+                        <h1 style="font-size: 4rem;" class="text-uppercase font-weight-bold"><strong>Pahami Karakter Unik Anak Anda?</strong></h1>
+                        <hr class="divider light my-4" />
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover mb-0">
-                                <thead class="table-dark sticky-top">
-                                    <tr>
-                                        <th width="50">ID</th>
-                                        <th>x_01</th><th>x_02</th><th>x_03</th><th>x_04</th><th>x_05</th>
-                                        <th>x_06</th><th>x_07</th><th>x_08</th><th>x_09</th><th>x_10</th>
-                                        <th width="120">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dataTable">
-                                    <tr><td colspan="12" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>
-                                </tbody>
-                            </table>
+                    <!-- Description and Button Part -->
+                    <div class="hero-description-button-part mt-auto mt-lg-0">
+                        <p class="text-white-75 mb-5">Setiap anak lahir dengan pola perilaku dan respons emosional yang khas. Memahami karakter bawaan ini adalah kunci untuk pola asuh yang lebih harmonis dan efektif. Lidan Psikologi siap membimbing Anda.</p>
+                        
+                    </div>
+                </div>
+                <!-- Right Column for Image on Desktop -->
+                <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center masthead-img-container order-lg-2 hero-image-col">
+                    <img src="https://lidan-psikologi.my.id/gambar/hero-1.jpg" alt="[Seseorang sedang berkonsultasi dengan psikolog]" class="img-fluid rounded shadow-lg animate-float img-fade-in" data-float="true">
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Problem & Consequences Section - Modified for Child Temperament -->
+    <section class="page-section bg-light" id="masalah">
+        <div class="container">
+            <div class="row gx-4 gx-lg-5 align-items-center">
+                <div class="col-lg-6 order-lg-2">
+                    <img class="img-fluid rounded mb-4 mb-lg-0 shadow-lg" src="https://lidan-psikologi.my.id/gambar/permasalahan-2.jpg" alt="[Seseorang sedang mengikuti tes psikologi]">
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <h2 class="text-center text-lg-start mt-0">Tantangan dalam Memahami Anak</h2>
+                    <hr class="divider my-4">
+                    <p class="text-muted mb-4">Orang tua seringkali menghadapi kebingungan dalam menghadapi perilaku anak yang berbeda-beda, seperti:</p>
+                    <ul class="list-unstyled text-muted">
+                        <li><i class="fas fa-exclamation-circle text-warning me-2"></i> <strong>Anak Cepat Marah/Emosional</strong>: Ledakan emosi yang sulit diprediksi atau dikelola.</li>
+                        <li><i class="fas fa-exclamation-circle text-warning me-2"></i> <strong>Anak Cenderung Pendiam/Pemalu</strong>: Sulit bersosialisasi atau mengekspresikan diri.</li>
+                        <li><i class="fas fa-exclamation-circle text-warning me-2"></i> <strong>Anak Sulit Beradaptasi</strong>: Menolak perubahan atau lingkungan baru.</li>
+                        <li><i class="fas fa-exclamation-circle text-warning me-2"></i> <strong>Anak Sangat Aktif/Tidak Bisa Diam</strong>: Sulit fokus atau mengikuti aturan.</li>
+                        <li><i class="fas fa-exclamation-circle text-warning me-2"></i> <strong>Komunikasi yang Kurang Efektif</strong>: Merasa tidak nyambung dengan cara anak merespons.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row gx-4 gx-lg-5 align-items-center mt-5">
+                <div class="col-lg-6">
+                    <img class="img-fluid rounded mb-4 mb-lg-0 shadow-lg" src="https://lidan-psikologi.my.id/gambar/akibat-1.jpg" alt="[Kelompok orang mengikuti seminar]">
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="text-center text-lg-start mt-0">Dampak Jika Karakter Anak Tak Dikenali</h2>
+                    <hr class="divider my-4">
+                    <p class="text-muted mb-4">Tanpa pemahaman yang tepat tentang karakter dasar anak, Anda mungkin menghadapi:</p>
+                    <ul class="list-unstyled text-muted">
+                        <li><i class="fas fa-frown text-danger me-2"></i> <strong>Pola Asuh Kurang Tepat</strong>: Menerapkan pendekatan yang tidak sesuai dengan kebutuhan anak.</li>
+                        <li><i class="fas fa-frown text-danger me-2"></i> <strong>Konflik Berulang</strong>: Kesalahpahaman yang menyebabkan ketegangan dalam keluarga.</li>
+                        <li><i class="fas fa-frown text-danger me-2"></i> <strong>Perkembangan Emosional Terhambat</strong>: Anak kesulitan mengelola perasaan atau mengekspresikan diri.</li>
+                        <li><i class="fas fa-frown text-danger me-2"></i> <strong>Potensi Anak Tidak Optimal</strong>: Anak tidak berkembang sesuai dengan kekuatan bawaannya.</li>
+                        <li><i class="fas fa-frown text-danger me-2"></i> <strong>Stres pada Orang Tua & Anak</strong>: Lingkungan rumah menjadi kurang kondusif dan penuh tekanan.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section - Modified for Child Temperament -->
+    <section class="page-section bg-primary text-white" id="solusi">
+        <div class="container px-4 px-lg-5 text-center">
+            <h2 class="mb-4">Lidan Psikologi: Kunci Memahami Karakter Anak Anda!</h2>
+            <p class="text-white-75 mb-5">Kami membantu Anda mengidentifikasi dan memahami pola perilaku bawaan anak Anda. Dengan pengetahuan ini, Anda dapat menerapkan strategi pola asuh yang lebih efektif, membangun komunikasi yang lebih baik, dan mendukung perkembangan optimal mereka.</p>
+            <a class="btn btn-light btn-xl" href="#layanan">Pahami Karakter Anak Sekarang</a>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section class="page-section" id="tentang-kami">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Mengenal Lidan Psikologi</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5 align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <img class="img-fluid rounded shadow-lg" src="https://lidan-psikologi.my.id/gambar/kantor-lidan.jpg" alt="[Ruang tunggu kantor Lidan Psikologi]">
+                </div>
+                <div class="col-lg-6">
+                    <p class="text-muted lead">Lidan Psikologi, di bawah naungan PT Lidan Indah Abadi, adalah pusat layanan psikologi terdepan di Medan. Kami berdedikasi untuk memberikan dukungan psikologis berkualitas tinggi bagi individu, keluarga, serta sektor pendidikan dan industri.</p>
+                    <p class="text-muted lead">Didukung oleh tim psikolog berlisensi dan berpengalaman, kami berkomitmen untuk membantu setiap klien menemukan kekuatan internal mereka, mengatasi tantangan, dan mencapai potensi penuh demi kehidupan yang lebih seimbang dan bahagia.</p>
+                </div>
+            </div>
+            <div class="row gx-4 gx-lg-5 mt-5">
+                <div class="col-lg-6 order-lg-2 mb-4 mb-lg-0">
+                    <img class="img-fluid rounded shadow-lg" src="https://lidan-psikologi.my.id/gambar/visi-misi1.jpg" alt="[Bagian dalam kantor Lidan Psikologi]">
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <h3 class="mt-0">Visi & Misi Kami</h3>
+                    <hr class="divider divider-sm my-3" />
+                    <p class="text-muted"><strong>Visi:</strong> Menjadi pionir dalam layanan psikologi yang inovatif dan berdampak positif bagi kesejahteraan mental masyarakat.</p>
+                    <p class="text-muted"><strong>Misi:</strong></p>
+                    <ul class="list-unstyled text-muted">
+                        <li><i class="fas fa-lightbulb text-warning me-2"></i> Memberikan layanan psikologi yang etis, profesional, dan relevan dengan kebutuhan zaman.</li>
+                        <li><i class="fas fa-lightbulb text-warning me-2"></i> Memfasilitasi pertumbuhan dan pengembangan individu melalui asesmen dan intervensi yang tepat.</li>
+                        <li><i class="fas fa-lightbulb text-warning me-2"></i> Meningkatkan kesadaran akan pentingnya kesehatan mental di berbagai lapisan masyarakat.</li>
+                        <li><i class="fas fa-lightbulb text-warning me-2"></i> Mengembangkan kolaborasi lintas sektor untuk dampak yang lebih luas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Overview Section -->
+    <section class="page-section bg-light" id="layanan">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Spektrum Layanan Kami</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5">
+                <div class="col-lg-4 col-md-6 text-center">
+                    <div class="mt-5">
+                        <div class="mb-2"><i class="fas fa-briefcase fs-1 text-primary"></i></div>
+                        <h3 class="h4 mb-2">Untuk Bisnis & Organisasi</h3>
+                        <p class="text-muted mb-0">Dukungan psikologi untuk rekrutmen, penilaian kinerja, dan pelatihan karyawan.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 text-center">
+                    <div class="mt-5">
+                        <div class="mb-2"><i class="fas fa-school fs-1 text-primary"></i></div>
+                        <h3 class="h4 mb-2">Untuk Pendidikan & Karir</h3>
+                        <p class="text-muted mb-0">Tes bakat minat, bimbingan akademik, dan perencanaan karir.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 text-center">
+                    <div class="mt-5">
+                        <div class="mb-2"><i class="fas fa-brain fs-1 text-primary"></i></div>
+                        <h3 class="h4 mb-2">Untuk Kesejahteraan Individu</h3>
+                        <p class="text-muted mb-0">Konseling personal, terapi, dan dukungan kesehatan mental.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Services Section -->
+    <section class="page-section" id="layanan-detail">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Layanan Mendalam Kami</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <!-- Industry & Organization -->
+                <div class="col-lg-8 mb-5">
+                    <div class="card shadow-lg border-0 rounded-4">
+                        <div class="card-body p-5">
+                            <h3 class="card-title text-primary mb-3"><i class="fas fa-users-cog me-2"></i> Layanan untuk Industri & Organisasi</h3>
+                            <p class="card-text text-muted">Kami mendukung pertumbuhan organisasi melalui:</p>
+                            <ul class="list-unstyled text-muted">
+                                <li><i class="fas fa-check me-2"></i> <strong>Asesmen Rekrutmen</strong>: Memilih talenta terbaik yang selaras dengan visi perusahaan.</li>
+                                <li><i class="fas fa-check me-2"></i> <strong>Pengembangan SDM</strong>: Program pelatihan untuk meningkatkan potensi dan produktivitas karyawan.</li>
+                                <li><i class="fas fa-check me-2"></i> <strong>Konseling Karyawan</strong>: Dukungan psikologis untuk kesejahteraan mental di tempat kerja.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Education & Development -->
+                <div class="col-lg-8 mb-5">
+                    <div class="card shadow-lg border-0 rounded-4">
+                        <div class="card-body p-5">
+                            <h3 class="card-title text-primary mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> Layanan untuk Pendidikan & Karir</h3>
+                            <p class="card-text text-muted">Membantu individu merencanakan masa depan yang cerah:</p>
+                            <ul class="list-unstyled text-muted">
+                                <li><i class="fas fa-check me-2"></i> <strong>Tes Bakat & Minat</strong>: Mengidentifikasi kekuatan dan passion untuk jalur pendidikan/karir yang optimal.</li>
+                                <li><i class="fas fa-check me-2"></i> <strong>Bimbingan Karir</strong>: Panduan personal untuk mencapai tujuan profesional.</li>
+                                <li><i class="fas fa-check me-2"></i> <strong>Konseling Akademik</strong>: Mengatasi hambatan belajar dan meningkatkan performa.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Clinical Services -->
+                <div class="col-lg-8">
+                    <div class="card shadow-lg border-0 rounded-4">
+                        <div class="card-body p-5">
+                            <h3 class="card-title text-primary mb-3"><i class="fas fa-hand-holding-heart me-2"></i> Layanan untuk Kesejahteraan Individu</h3>
+                            <p class="card-text text-muted">Mendukung kesehatan mental dan emosional Anda secara holistik:</p>
+                            <ul class="list-unstyled text-muted">
+                                <li><i class="fas fa-check me-2"></i> <strong>Konseling Individu</strong>: Mengelola stres, kecemasan, depresi, trauma, dan tantangan hidup lainnya.</li>
+                                <li><i class="fas fa-check me-2"></i> <strong>Konseling Keluarga & Pasangan</strong>: Membangun komunikasi yang sehat dan harmonis.</li>
+                                <li><i class="fas fa-check me-2"></i> <strong>Terapi Anak & Remaja</strong>: Penanganan isu perilaku dan emosional pada usia perkembangan.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Add Modal -->
-    <div class="modal fade" id="addModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Tambah Data</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addForm">
-                        <div class="row g-2">
-                            <div class="col-md-6"><label class="form-label">x_01</label><input type="text" name="x_01" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_02</label><input type="text" name="x_02" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_03</label><input type="text" name="x_03" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_04</label><input type="text" name="x_04" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_05</label><input type="text" name="x_05" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_06</label><input type="text" name="x_06" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_07</label><input type="text" name="x_07" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_08</label><input type="text" name="x_08" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_09</label><input type="text" name="x_09" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_10</label><input type="text" name="x_10" class="form-control form-control-sm"></div>
+    <!-- Psychological Tests Section -->
+    <section class="page-section bg-light" id="tes-psikologi">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Jenis Asesmen Psikologi Kami</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                        <img src="https://lidan-psikologi.my.id/gambar/tes-lidan-psikologi.jpg" class="card-img-top rounded-top-4" alt="[Seseorang sedang mengisi formulir tes psikologi]">
+                        <div class="card-body text-center p-4">
+                            <h4 class="card-title text-primary">Tes Bakat & Minat</h4>
+                            <p class="card-text text-muted">Gali potensi unik dan temukan arah yang sesuai dengan diri Anda.</p>
                         </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                        <img src="https://lidan-psikologi.my.id/gambar/rekrutmen-karyawan1.jpg" class="card-img-top rounded-top-4" alt="[Seseorang sedang melakukan psikotes rekrutmen]">
+                        <div class="card-body text-center p-4">
+                            <h4 class="card-title text-primary">Psikotes Rekrutmen</h4>
+                            <p class="card-text text-muted">Solusi terpercaya untuk seleksi karyawan yang efektif dan objektif.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                        <img src="https://lidan-psikologi.my.id/gambar/klinis2.jpg" class="card-img-top rounded-top-4" alt="[Seseorang sedang berkonsultasi dengan psikolog]">
+                        <div class="card-body text-center p-4">
+                            <h4 class="card-title text-primary">Asesmen Klinis</h4>
+                            <p class="card-text text-muted">Evaluasi mendalam untuk pemahaman dan penanganan kondisi psikologis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Team / Psychologists Section -->
+    <section class="page-section" id="psikolog">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Temui Tim Psikolog Kami</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4 text-center">
+                        <img src="https://lidan-psikologi.my.id/gambar/dr-karina.jpg" class="card-img-top rounded-top-4 team-img" alt="[Foto Dr. Karina M. Brahmana]">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-primary mb-1">Dr. Karina M. Brahmana</h5>
+                            <p class="card-text text-muted">Psikolog Industri & Pendidikan</p>
+                            <div class="social-icons mt-3">
+                                <a href="#" class="text-secondary mx-2"><i class="fab fa-linkedin fa-lg"></i></a>
+                                <a href="#" class="text-secondary mx-2"><i class="fab fa-instagram fa-lg"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4 text-center">
+                        <img src="https://lidan-psikologi.my.id/gambar/artiwinata.jpg" class="card-img-top rounded-top-4 team-img" alt="[Foto Artiwinata Ginting]">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-primary mb-1">Artiwinata Ginting</h5>
+                            <p class="card-text text-muted">Psikolog Pendidikan & Perkembangan</p>
+                            <div class="social-icons mt-3">
+                                <a href="#" class="text-secondary mx-2"><i class="fab fa-linkedin fa-lg"></i></a>
+                                <a href="#" class="text-secondary mx-2"><i class="fab fa-instagram fa-lg"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4 text-center">
+                        <img src="https://lidan-psikologi.my.id/gambar/dr-nenny-simarmata.jpg" class="card-img-top rounded-top-4 team-img" alt="[Foto Dr. Nenny Simarmata]">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-primary mb-1">Dr. Nenny Simarmata</h5>
+                            <p class="card-text text-muted">Psikolog Industri & Organisasi</p>
+                            <div class="social-icons mt-3">
+                                <a href="#" class="text-secondary mx-2"><i class="fab fa-linkedin fa-lg"></i></a>
+                                <a href="#" class="text-secondary mx-2"><i class="fab fa-instagram fa-lg"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Facilities Section -->
+    <section class="page-section bg-light" id="fasilitas">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Lingkungan yang Mendukung</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                        <img src="https://lidan-psikologi.my.id/gambar/07.png" class="card-img-top rounded-top-4" alt="[Ruang konseling yang nyaman]">
+                        <div class="card-body text-center p-4">
+                            <h4 class="card-title text-primary">Ruang Konseling Privat</h4>
+                            <p class="card-text text-muted">Suasana tenang dan kondusif untuk sesi terapi yang efektif.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                        <img src="https://lidan-psikologi.my.id/gambar/02.png" class="card-img-top rounded-top-4" alt="[Area resepsionis yang modern]">
+                        <div class="card-body text-center p-4">
+                            <h4 class="card-title text-primary">Area Resepsionis Modern</h4>
+                            <p class="card-text text-muted">Sambutan hangat dan lingkungan yang nyaman sejak kedatangan Anda.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                        <img src="https://lidan-psikologi.my.id/gambar/kantor-lidan.jpg" class="card-img-top rounded-top-4" alt="[Interior kantor Lidan Psikologi]">
+                        <div class="card-body text-center p-4">
+                            <h4 class="card-title text-primary">Fasilitas Lengkap</h4>
+                            <p class="card-text text-muted">Lingkungan yang dirancang untuk kenyamanan dan privasi Anda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Past Activities Section -->
+    <section class="page-section" id="aktivitas">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Jejak Aktivitas Kami</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4">
+                        <img src="https://lidan-psikologi.my.id/gambar/seminar-persiapan-kerja2.jpg" class="card-img-top rounded-top-4" alt="[Foto seminar persiapan kerja]">
+                        <div class="card-body p-4">
+                            <h4 class="card-title text-primary">Workshop Pengembangan Diri</h4>
+                            <p class="card-text text-muted">Berbagi wawasan dan keterampilan untuk pengembangan personal dan profesional.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4">
+                        <img src="https://lidan-psikologi.my.id/gambar/tes-lidan-psikologi.jpg" class="card-img-top rounded-top-4" alt="[Foto tes psikologi massal]">
+                        <div class="card-body text-center p-4">
+                            <h4 class="card-title text-primary">Asesmen Skala Besar</h4>
+                            <p class="card-text text-muted">Melakukan tes psikologi untuk lembaga pendidikan dan organisasi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="page-section bg-primary text-white" id="keunggulan">
+        <div class="container px-4 px-lg-5 text-center">
+            <h2 class="mb-4">Mengapa Memilih Lidan Psikologi?</h2>
+            <hr class="divider light my-4" />
+            <div class="row gx-4 gx-lg-5">
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                    <div class="feature-item">
+                        <i class="fas fa-certificate fs-1 text-white mb-3"></i>
+                        <h3 class="h4 mb-2">Profesional Berlisensi</h3>
+                        <p class="text-white-75 mb-0">Tim psikolog kami memiliki kualifikasi dan pengalaman yang teruji.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                    <div class="feature-item">
+                        <i class="fas fa-user-friends fs-1 text-white mb-3"></i>
+                        <h3 class="h4 mb-2">Pendekatan Holistik</h3>
+                        <p class="text-white-75 mb-0">Kami melihat Anda sebagai individu seutuhnya, bukan hanya masalah Anda.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-item">
+                        <i class="fas fa-calendar-check fs-1 text-white mb-3"></i>
+                        <h3 class="h4 mb-2">Aksesibilitas Fleksibel</h3>
+                        <p class="text-white-75 mb-0">Layanan tersedia secara online dan offline sesuai kebutuhan Anda.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Packages Section -->
+    <section class="page-section" id="paket">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Pilihan Paket Layanan Kami</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <!-- Paket Gratis -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4 package-card">
+                        <div class="card-header bg-gradient-light text-center py-4 rounded-top-4">
+                            <h4 class="my-0 fw-normal text-primary">Paket Pengenalan</h4>
+                            <h1 class="card-title pricing-card-title text-dark">Gratis</h1>
+                        </div>
+                        <div class="card-body p-4">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Konsultasi Singkat (15 Menit)</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Orientasi Layanan</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Rekomendasi Awal</li>
+                                <li><i class="fas fa-times-circle text-danger me-2"></i> Tanpa Asesmen Formal</li>
+                                <li><i class="fas fa-times-circle text-danger me-2"></i> Tanpa Laporan Detail</li>
+                            </ul>
+                            <a href="https://wa.me/6285159601400?text=Halo%20Lidan%20Psikologi,%20saya%20tertarik%20dengan%20Paket%20Pengenalan%20Gratis." class="btn btn-primary btn-block btn-lg package-btn">Dapatkan Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paket Dasar -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4 package-card">
+                        <div class="card-header bg-gradient-primary text-white text-center py-4 rounded-top-4">
+                            <h4 class="my-0 fw-normal">Paket Esensial</h4>
+                            <h1 class="card-title pricing-card-title">Mulai dari Rp. 350.000</h1>
+                        </div>
+                        <div class="card-body p-4">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Sesi Konseling Individu (1x)</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Pilihan 1 Jenis Tes (Bakat/Minat/Klinis Dasar)</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Ringkasan Hasil Asesmen</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Sesi Feedback Singkat</li>
+                                <li><i class="fas fa-times-circle text-danger me-2"></i> Tanpa Dukungan Lanjutan</li>
+                            </ul>
+                            <a href="https://wa.me/6285159601400?text=Halo%20Lidan%20Psikologi,%20saya%20tertarik%20dengan%20Paket%20Esensial." class="btn btn-outline-primary btn-block btn-lg package-btn">Pilih Paket Esensial</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paket Premium -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4 package-card">
+                        <div class="card-header bg-gradient-dark text-white text-center py-4 rounded-top-4">
+                            <h4 class="my-0 fw-normal">Paket Komprehensif</h4>
+                            <h1 class="card-title pricing-card-title">Mulai dari Rp. 950.000</h1>
+                        </div>
+                        <div class="card-body p-4">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Konseling Intensif (3 Sesi)</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Pilihan 2 Jenis Tes (Misal: Bakat & Rekrutmen)</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Laporan Asesmen Lengkap & Rekomendasi</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Sesi Feedback Mendalam</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Dukungan Pasca-Sesi (1 Minggu)</li>
+                            </ul>
+                            <a href="https://wa.me/6285159601400?text=Halo%20Lidan%20Psikologi,%20saya%20tertarik%20dengan%20Paket%20Komprehensif." class="btn btn-primary btn-block btn-lg package-btn">Pilih Paket Komprehensif</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="page-section bg-light" id="video">
+        <div class="container px-4 px-lg-5 text-center">
+            <h2 class="mt-0">Jelajahi Lidan Psikologi dalam Video</h2>
+            <hr class="divider my-4" />
+            <div class="embed-responsive embed-responsive-16by9 rounded-4 shadow-lg mx-auto" style="max-width: 800px;">
+
+
+                <div class="ratio ratio-16x9 rounded-3 shadow-lg">
+                    <iframe src="https://www.youtube.com/embed/4tPQrHLjJDg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+            <p class="text-muted mt-4">Video ini menawarkan sekilas pandang tentang suasana dan komitmen kami dalam melayani Anda.</p>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="page-section bg-primary text-white">
+        <div class="container px-4 px-lg-5 text-center">
+            <h2 class="mb-4">Siap Melangkah Menuju Diri yang Lebih Baik?</h2>
+            <p class="text-white-75 mb-5">Jangan ragu untuk menghubungi kami. Tim profesional kami siap mendengarkan dan membantu Anda.</p>
+            <a class="btn btn-light btn-xl" href="#kontak">Hubungi Kami Sekarang</a>
+        </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section class="page-section" id="kontak">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Kontak Kami</h2>
+            <hr class="divider my-4" />
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-8 col-xl-6">
+                    <p class="text-center text-muted mb-5">Ada pertanyaan atau ingin membuat janji temu? Isi formulir di bawah ini atau hubungi kami langsung.</p>
+                    <form id="contactForm">
+                        <div class="form-floating mb-3">
+                            <input class="form-control rounded-pill" id="name" type="text" placeholder="Masukkan nama Anda..." required />
+                            <label for="name">Nama Lengkap</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control rounded-pill" id="email" type="email" placeholder="nama@contoh.com" required />
+                            <label for="email">Alamat Email</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control rounded-pill" id="phone" type="tel" placeholder="+62 812..." required />
+                            <label for="phone">Nomor Telepon</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control rounded-4" id="message" type="text" placeholder="Masukkan pesan Anda di sini..." style="height: 10rem" required></textarea>
+                            <label for="message">Pesan</label>
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-xl rounded-pill" id="submitButton" type="submit">Kirim Pesan</button>
+                        </div>
+                        <div id="formMessage" class="mt-3 text-center"></div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-success btn-sm" onclick="saveData()"><i class="fas fa-save me-1"></i>Simpan</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark py-5">
+        <div class="container px-4 px-lg-5">
+            <div class="row text-white-50">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-white">Lidan Psikologi</h5>
+                    <p class="small">Bagian dari PT Lidan Indah Abadi, berkomitmen untuk menyediakan layanan psikologi profesional dan etis untuk kesejahteraan mental Anda.</p>
+                    <img src="https://lidan-psikologi.my.id/gambar/logo-psikologi.png" alt="[Logo Lidan Psikologi di Footer]" class="logo-footer mt-2">
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-white">Informasi Kontak</h5>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> Regus - Forum Nine</li>
+                        <li>Jl. Imam Bonjol No. 9 Forum Nine 9th Floor, Medan</li>
+                        <li><i class="fas fa-phone me-2"></i> Telp/WA: +62 851 5960 1400</li>
+                        <li><i class="fas fa-envelope me-2"></i> Email: info@lidan.co.id</li>
+                        <li><i class="fas fa-clock me-2"></i> Jam Operasional:</li>
+                        <li>Senin - Jumat: 08:00 - 17:00</li>
+                        <li>Sabtu / Minggu: Tutup</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white">Ikuti Kami</h5>
+                    <div class="social-links">
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                    <p class="small mt-3">&copy; <span id="currentYear"></span> PT Lidan Indah Abadi. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/6285159601400" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Floating "Coba Gratis" Button -->
+    <a href="#paket" class="floating-coba-gratis-btn">Coba Gratis</a>
+
+    <!-- Popup Paket Pengenalan Gratis -->
+    <div id="popupGratis" class="popup-overlay">
+        <div class="popup-content">
+            <button class="close-btn" id="closePopup">&times;</button>
+            <div class="card shadow-lg border-0 rounded-4 package-card">
+                <div class="card-header bg-gradient-light text-center py-4 rounded-top-4">
+                    <h4 class="my-0 fw-normal text-primary">Paket Pengenalan</h4>
+                    <h1 class="card-title pricing-card-title text-dark">Gratis</h1>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Konsultasi Singkat (15 Menit)</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Orientasi Layanan</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Rekomendasi Awal</li>
+                        <li><i class="fas fa-times-circle text-danger me-2"></i> Tanpa Asesmen Formal</li>
+                        <li><i class="fas fa-times-circle text-danger me-2"></i> Tanpa Laporan Detail</li>
+                    </ul>
+                    <a href="https://wa.me/6285159601400?text=Halo%20Lidan%20Psikologi,%20saya%20tertarik%20dengan%20Paket%20Pengenalan%20Gratis." class="btn btn-primary btn-block btn-lg package-btn">Dapatkan Sekarang</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Data</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editForm">
-                        <input type="hidden" id="editId">
-                        <div class="row g-2">
-                            <div class="col-md-6"><label class="form-label">x_01</label><input type="text" name="x_01" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_02</label><input type="text" name="x_02" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_03</label><input type="text" name="x_03" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_04</label><input type="text" name="x_04" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_05</label><input type="text" name="x_05" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_06</label><input type="text" name="x_06" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_07</label><input type="text" name="x_07" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_08</label><input type="text" name="x_08" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_09</label><input type="text" name="x_09" class="form-control form-control-sm"></div>
-                            <div class="col-md-6"><label class="form-label">x_10</label><input type="text" name="x_10" class="form-control form-control-sm"></div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-warning btn-sm" onclick="updateData()"><i class="fas fa-save me-1"></i>Update</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    <script>
-        let currentTable = 'data_latihan';
-        
-        $(document).ready(function(){
-            // Get table name from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            currentTable = urlParams.get('tabel') || 'data_latihan';
-            $('#tableName').text(currentTable);
-            
-            loadData();
-        });
-
-        function loadData() {
-            $.ajax({
-                url: `/api/contacts?table=${currentTable}`,
-                method: 'GET',
-                headers: {'X-Table-Name': currentTable},
-                success: function(response) {
-                    let html = '';
-                    if(response.data && response.data.length > 0) {
-                        response.data.forEach(item => {
-                            html += `<tr>
-                                <td>${item.id_x}</td>
-                                <td>${item.x_01||''}</td><td>${item.x_02||''}</td><td>${item.x_03||''}</td><td>${item.x_04||''}</td><td>${item.x_05||''}</td>
-                                <td>${item.x_06||''}</td><td>${item.x_07||''}</td><td>${item.x_08||''}</td><td>${item.x_09||''}</td><td>${item.x_10||''}</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm me-1" onclick="editData(${item.id_x})"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteData(${item.id_x})"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>`;
-                        });
-                    } else {
-                        html = '<tr><td colspan="12" class="text-center py-4 text-muted">Tidak ada data</td></tr>';
-                    }
-                    $('#dataTable').html(html);
-                },
-                error: function() {
-                    $('#dataTable').html('<tr><td colspan="12" class="text-center py-4 text-danger">Error loading data</td></tr>');
-                }
-            });
-        }
-
-        function saveData() {
-            const formData = {};
-            for(let i = 1; i <= 10; i++) {
-                formData[`x_0${i}`] = $(`#addForm input[name="x_0${i}"]`).val() || '';
-            }
-
-            $.ajax({
-                url: `/api/contacts?table=${currentTable}`,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Table-Name': currentTable
-                },
-                data: JSON.stringify(formData),
-                success: function() {
-                    $('#addModal').modal('hide');
-                    $('#addForm')[0].reset();
-                    loadData();
-                    showAlert('Data berhasil ditambahkan!', 'success');
-                },
-                error: function() { showAlert('Error menambah data!', 'danger'); }
-            });
-        }
-
-        function editData(id) {
-            $.ajax({
-                url: `/api/contacts/${id}?table=${currentTable}`,
-                method: 'GET',
-                headers: {'X-Table-Name': currentTable},
-                success: function(response) {
-                    if(response.data) {
-                        $('#editId').val(response.data.id_x);
-                        for(let i = 1; i <= 10; i++) {
-                            $(`#editForm input[name="x_0${i}"]`).val(response.data[`x_0${i}`] || '');
-                        }
-                        $('#editModal').modal('show');
-                    }
-                },
-                error: function() { showAlert('Error loading data!', 'danger'); }
-            });
-        }
-
-        function updateData() {
-            const id = $('#editId').val();
-            const formData = {};
-            for(let i = 1; i <= 10; i++) {
-                formData[`x_0${i}`] = $(`#editForm input[name="x_0${i}"]`).val() || '';
-            }
-
-            $.ajax({
-                url: `/api/contacts/${id}?table=${currentTable}`,
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Table-Name': currentTable
-                },
-                data: JSON.stringify(formData),
-                success: function() {
-                    $('#editModal').modal('hide');
-                    loadData();
-                    showAlert('Data berhasil diupdate!', 'success');
-                },
-                error: function() { showAlert('Error update data!', 'danger'); }
-            });
-        }
-
-        function deleteData(id) {
-            if(confirm('Yakin ingin menghapus data ini?')) {
-                $.ajax({
-                    url: `/api/contacts/${id}?table=${currentTable}`,
-                    method: 'DELETE',
-                    headers: {'X-Table-Name': currentTable},
-                    success: function() {
-                        loadData();
-                        showAlert('Data berhasil dihapus!', 'success');
-                    },
-                    error: function() { showAlert('Error hapus data!', 'danger'); }
-                });
-            }
-        }
-
-        function showAlert(message, type) {
-            const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show position-fixed" style="top:20px;right:20px;z-index:9999">
-                ${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-            $('body').append(alertHtml);
-            setTimeout(() => $('.alert').alert('close'), 3000);
-        }
-    </script>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/script.js"></script>
 </body>
 </html>
