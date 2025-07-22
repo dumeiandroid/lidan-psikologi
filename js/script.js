@@ -151,11 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#navbarResponsive .nav-link')
     );
     responsiveNavItems.map(function (responsiveNavItem) {
-        responsiveNavItem.addEventListener('click', () => {
-            if (window.getComputedStyle(navbarToggler).display !== 'none') {
-                navbarToggler.click();
-            }
-        });
+        // Hanya tutup navbar jika nav-link yang diklik BUKAN bagian dari dropdown
+        // atau jika itu adalah item dropdown (sub-menu)
+        if (!responsiveNavItem.classList.contains('dropdown-toggle')) {
+            responsiveNavItem.addEventListener('click', () => {
+                if (window.getComputedStyle(navbarToggler).display !== 'none') {
+                    navbarToggler.click();
+                }
+            });
+        }
     });
 
     // Tambahkan kode ini untuk menambahkan kelas img-fade-in ke semua gambar
