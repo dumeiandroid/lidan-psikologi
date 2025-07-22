@@ -606,7 +606,7 @@ footer .social-links a:hover {
 
 /* Kelas yang ditambahkan JS saat gambar terlihat */
 .img-fade-in.is-visible {
-    animation: fadeInUp 0.8s forwards; /* Terapkan animasi fadeInUp */
+    animation: fadeInUp 1.8s forwards; /* Terapkan animasi fadeInUp */
 }
 
 /* Gaya untuk gambar yang bergerak naik turun */

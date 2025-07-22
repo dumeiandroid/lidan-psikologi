@@ -158,8 +158,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Tambahkan kode ini untuk menambahkan kelas img-fade-in ke semua gambar
+    const allImages = document.querySelectorAll('img');
+    allImages.forEach(img => {
+        // Hanya tambahkan jika belum ada, dan hindari gambar di hero section jika sudah diatur secara terpisah
+        // Atau jika Anda ingin semua gambar termasuk hero dianimasikan dengan cara ini,
+        // pastikan tidak ada duplikasi atau konflik dengan animasi hero yang sudah ada.
+        // Untuk amannya, kita bisa mengecualikan gambar di hero section jika sudah memiliki animasi khusus.
+        if (!img.classList.contains('img-fade-in') && !img.closest('.masthead')) {
+            img.classList.add('img-fade-in');
+        }
+        // Jika Anda ingin semua gambar, termasuk hero, dianimasikan dengan cara ini,
+        // Anda bisa menyederhanakan menjadi:
+        // img.classList.add('img-fade-in');
+    });
+
+
     // Intersection Observer for image animations and lazy loading
-    const imagesToAnimate = document.querySelectorAll('img.img-fade-in');
+    const imagesToAnimate = document.querySelectorAll('img.img-fade-in'); // Ini akan memilih semua gambar yang sekarang memiliki kelas ini
 
     const observerOptions = {
         root: null, // viewport as the root
@@ -175,8 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // If the image should also float, add the float animation after the fade-in animation duration
                 if (img.dataset.float === 'true') {
-                    // Remove animate-float temporarily if it was somehow added, then re-add after fade-in
-                    // This ensures the float animation starts fresh after the fade-in completes.
                     img.classList.remove('animate-float');
                     setTimeout(() => {
                         img.classList.add('animate-float');
