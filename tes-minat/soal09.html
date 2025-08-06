@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soal Psikotest</title>
+    <script>
+        if (!localStorage.getItem('user')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <link rel="stylesheet" href="css_tes.css">
+</head>
+<body>
+
+    <div class="keterangan_soal">
+        <h1>Keterangan Soal</h1>
+        <p>Berikut ini adalah persoalan bahasa. Anda akan disediakan 3 kata-kata dan diminta untuk mencari kata ke-4. Kata ke-4 itu mempunyai hubungan tertentu dengan kata ke-3, seperti hubungan yang ada antara kata ke-1 dan kata ke-2.</p>
+        <h2>Contoh 1</h2>
+        <img src="https://latihan1.pages.dev/01/test/gambar/tkd3_1a.png" alt="">
+        <h2>Contoh 2</h2>
+        <img src="https://latihan1.pages.dev/01/test/gambar/tkd3_1b.png" alt="">
+        <h2>Penjelasan Jawaban</h2>
+        <b>Contoh pertama</b>
+        <p>Jika anda perhatikan hubungan antara nuri dan burung adalah bahwa nuri merupakan salah satu jenis burung, maka hubungan antara sepat dan salah satu kata pilihan ialah Sepat merupakan salah satu jenis ikan. Oleh karena itu, jawaban yang tepat adalah b. ikan</p>
+        <b>Contoh kedua</b>
+        <p>Panas ialah lawannya dari dingin, maka untuk suka lawannya adalah duka. Maka jawaban yang benar ialah c. Duka.</p>
+    <h1>Kerjakan Dengan Teliti</h1>
+    </div>
+    <button id="startButton" onclick="startGame()">Mulai</button>
+    <div id="question" class="hidden"></div>
+    <div id="timer" class="hidden">Waktu Tersisa: 360 detik</div>
+    <div class="options hidden"></div>
+    
+    <div class="scoreboard putih">
+        <div style="color: #f4f4f4; user-select: none; pointer-events: none;">Jawaban Pengguna: <span id="userAnswers"></span></div>
+    </div>
+    <div class="result" id="result"></div> <!-- Tambahkan div untuk menampilkan hasil API -->
+
+    <script>
+        let correctScore = 0;
+        let wrongScore = 0;
+        let timeLeft = 360;
+        let currentQuestionIndex = 0;
+        let currentQuestion, correctAnswer;
+        let answeredQuestions = [];
+        let skippedQuestions = [];
+        let questions = [];
+        let userAnswers = []; // Array untuk menyimpan jawaban pengguna
+        let timerInterval;
+
+        // Konfigurasi API untuk menyimpan hasil (SESUAIKAN DENGAN KEBUTUHAN ANDA)
+        const API_URL = 'https://lidan-co-id.pages.dev/api/contacts_filter_dinamis';
+        const TABLE_NAME = 'nilai1'; // Nama tabel yang akan di-update
+        const ID_TO_UPDATE = parseInt(localStorage.getItem('id_x')); // ID data yang akan di-update
+
+        // Muat status permainan dari localStorage
+        function loadGameState() {
+            const savedState = localStorage.getItem('gameIst1');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                correctScore = state.correctScore || 0;
+                wrongScore = state.wrongScore || 0;
+                currentQuestionIndex = state.currentQuestionIndex || 0;
+                userAnswers = state.userAnswers || [];
+                timeLeft = state.timeLeft || 360;
+                document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+            }
+            newQuestion();
+        }
+
+        // Simpan status permainan ke localStorage
+        function saveGameState() {
+            const gameState = {
+                correctScore: correctScore,
+                wrongScore: wrongScore,
+                currentQuestionIndex: currentQuestionIndex,
+                userAnswers: userAnswers,
+                timeLeft: timeLeft
+            };
+            localStorage.setItem('gameIst1', JSON.stringify(gameState));
+        }
+
+        // Mengirim hasil kuis ke API dengan memperbarui elemen kelima (indeks 4) dari kolom x_05 dan x_08.
+        async function sendResultToApi(score, answers) {
+            const id = ID_TO_UPDATE;
+            const resultDiv = document.getElementById("result");
+            
+            // Tampilkan pesan loading
+            resultDiv.innerHTML += `
+            <p style="color: blue;">Memproses data dan mengirim ke server...</p>
+            `;
+
+            try {
+                // Langkah 1: Ambil data yang ada dari API
+                const getUrl = `${API_URL}?table=${TABLE_NAME}&id_x_eq=${id}`;
+                console.log('Fetching existing data from URL:', getUrl);
+                const getResponse = await fetch(getUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Table-Name': TABLE_NAME
+                    }
+                });
+
+                if (!getResponse.ok) {
+                    throw new Error(`Gagal mengambil data dari API, status: ${getResponse.status}`);
+                }
+                const existingData = await getResponse.json();
+
+                if (!existingData.data || existingData.data.length === 0) {
+                    throw new Error('Data tidak ditemukan untuk ID yang diberikan.');
+                }
+
+                // Ambil nilai x_05 dan x_08 yang sudah ada
+                let x05 = existingData.data[0].x_05 || '';
+                let x08 = existingData.data[0].x_08 || '';
+
+                // Langkah 2 & 3: "Explode" string, perbarui elemen kelima (indeks 4)
+                let x05Parts = x05.split('|');
+                // Pastikan array memiliki setidaknya 5 elemen sebelum mencoba mengakses indeks 4
+                while (x05Parts.length <= 4) {
+                    x05Parts.push(''); // Tambahkan elemen kosong jika kurang
+                }
+                x05Parts[4] = `${score}`;
+                let newX05Value = x05Parts.join('|');
+
+                let x08Parts = x08.split('|');
+                // Pastikan array memiliki setidaknya 5 elemen sebelum mencoba mengakses indeks 4
+                while (x08Parts.length <= 4) {
+                    x08Parts.push(''); // Tambahkan elemen kosong jika kurang
+                }
+                x08Parts[4] = answers.join(', ');
+                let newX08Value = x08Parts.join('|');
+                
+                // Langkah 4: Siapkan data untuk permintaan PUT
+                const formData = {
+                    x_05: newX05Value,
+                    x_08: newX08Value
+                };
+
+                // Langkah 5: Kirim permintaan PUT ke API
+                const putUrl = `${API_URL}?table=${TABLE_NAME}&id_x=${id}`;
+                console.log('Updating data via PUT to URL:', putUrl);
+                console.log('Data to be sent:', formData);
+                
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Table-Name': TABLE_NAME
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!putResponse.ok) {
+                    const errorData = await putResponse.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${putResponse.status}`);
+                }
+
+                const data = await putResponse.json();
+                console.log('Save API response:', data);
+
+                // Perbarui pesan di UI setelah sukses
+                resultDiv.innerHTML += `
+                <p style="color: green;">Data berhasil disimpan!</p>
+                `;
+
+            } catch (error) {
+                console.error('Error saving data:', error);
+                // Perbarui pesan di UI jika terjadi error
+                resultDiv.innerHTML += `
+                <p style="color: red;">Error menyimpan data: ${error.message || error}</p>
+                `;
+            }
+        }
+
+        // Ambil pertanyaan dari URL yang ditentukan
+        fetch('https://latihan1.pages.dev/01/test/psikotest/ist1.txt?v=' + new Date().getTime())
+        .then(response => response.json())
+        .then(data => {
+            questions = data;
+                loadGameState(); // Muat status permainan setelah data berhasil dimuat
+            })
+        .catch(error => console.error('Error fetching the questions:', error));
+
+        function startGame() {
+            document.querySelector(".keterangan_soal").classList.add("hidden");
+            document.getElementById("startButton").disabled = true;
+            document.querySelector(".options").classList.remove("hidden");
+            document.getElementById("question").classList.remove("hidden");
+            document.getElementById("timer").classList.remove("hidden");
+            startTimer();
+            // newQuestion() dipanggil oleh loadGameState
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                timeLeft--;
+                document.getElementById("timer").innerHTML = "Waktu Tersisa: " + timeLeft + " detik";
+                saveGameState(); // Simpan status permainan setiap detik
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame(true); // Akhiri permainan karena waktu habis
+                }
+            }, 1000);
+        }
+
+        function newQuestion() {
+            // Periksa apakah kita sudah mencapai akhir pertanyaan
+            if (currentQuestionIndex >= questions.length) {
+                endGame(false); // Akhiri permainan karena semua pertanyaan telah dijawab
+                return;
+            }
+
+            // Dapatkan pertanyaan berikutnya
+            currentQuestion = questions[currentQuestionIndex];
+            correctAnswer = currentQuestion.answer;
+
+            // Perbarui teks pertanyaan
+            document.getElementById("question").innerHTML = currentQuestion.question;
+
+            // Hapus opsi sebelumnya
+            const optionsDiv = document.querySelector(".options");
+            optionsDiv.innerHTML = ""; // Hapus opsi yang ada
+
+            // Buat tombol untuk setiap opsi yang ditentukan
+            for (const option in currentQuestion.options) {
+                if (currentQuestion.options[option] !== undefined) {
+                    const button = document.createElement("button");
+                    button.innerHTML = `${option}. ${currentQuestion.options[option]}`;
+                    button.onclick = () => submitAnswer(option);
+                    optionsDiv.appendChild(button);
+                }
+            }
+
+            // Tambahkan tombol lewati
+            const skipButton = document.createElement("button");
+            skipButton.innerHTML = "Lewati";
+            skipButton.onclick = skipQuestion;
+            optionsDiv.appendChild(skipButton);
+        }
+
+        function submitAnswer(option) {
+            answeredQuestions.push({
+                question: currentQuestion.question,
+                userAnswer: option,
+                correctAnswer: correctAnswer
+            });
+
+            // Dapatkan nomor pertanyaan dari atribut pertanyaan
+            const questionNumber = currentQuestion.question.split('.')[0].trim();
+
+            // Tentukan apakah jawabannya benar atau salah
+            const resultIndicator = (option === correctAnswer) ? 'v' : 'x';
+
+            // Simpan jawaban pengguna dalam format yang diinginkan
+            userAnswers.push(`${questionNumber}${option}${resultIndicator}`);
+
+            // Perbarui skor
+            if (option === correctAnswer) {
+                correctScore++;
+            } else {
+                wrongScore++;
+            }
+
+            // Perbarui jawaban pengguna yang ditampilkan
+            document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+
+            currentQuestionIndex++; // Pindah ke pertanyaan berikutnya
+            saveGameState(); // Simpan status permainan setelah menjawab
+            newQuestion();
+        }
+
+        function skipQuestion() {
+            // Tambahkan pertanyaan yang dilewati ke akhir array pertanyaan untuk dijawab nanti
+            questions.push(currentQuestion);
+            currentQuestionIndex++; // Pindah ke pertanyaan berikutnya dalam daftar asli
+            newQuestion();
+            saveGameState(); // Simpan status permainan setelah melewati
+        }
+
+        function endGame(timeout) {
+            clearInterval(timerInterval);
+            document.querySelector(".options").classList.add("hidden");
+            document.getElementById("timer").classList.add("hidden");
+
+            let finalMessage = "";
+            if (timeout) {
+                finalMessage = "Waktu Habis! Soal telah selesai, tunggu soal berikutnya.";
+            } else {
+                finalMessage = "Soal telah selesai, semua telah dikerjakan!";
+            }
+
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = `
+            <div style="text-align: center;">
+            <h2>${finalMessage}</h2>
+            <p>Skor Benar: ${correctScore}</p>
+            <p>Jawaban Anda: ${userAnswers.join('; ')}</p>
+            <p>Data sedang dikirim ke server...</p>
+            </div>
+            `;
+            
+            // Panggil fungsi untuk mengirim data ke API
+            sendResultToApi(correctScore, userAnswers);
+
+            localStorage.removeItem('gameIst1'); // Hapus status permainan dari localStorage
+        }
+
+        // Atur tombol agar awalnya dapat diklik
+        window.onload = function() {
+            document.getElementById("startButton").disabled = false;
+        };
+    </script>
+</body>
+</html>

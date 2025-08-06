@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soal Psikotest</title>
+    <script>
+        if (!localStorage.getItem('user')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <!-- CSS digabungkan ke dalam file ini untuk kemudahan debugging -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #startButton {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #585353;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #startButton:hover {
+            background-color: #050000;
+        }
+
+        #question {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .options1 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .options1 button {
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #585353;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .options1 button:hover {
+            background-color: #050000;
+        }
+
+        .scoreboard {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Styling untuk pesan loading, sukses, dan error */
+        #loading-message, #success-message, #error-message {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #loading-message { color: blue; }
+        #success-message { color: green; }
+        #error-message { color: red; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <button id="startButton" onclick="startGame()">Mulai</button>
+        <h1>Pilih yang sesuai <br>atau mendekati diri anda</h1>
+
+        <!-- Scoreboard is initially hidden using inline style for robustness -->
+        <div class="scoreboard putih" style="display: none;">
+            <div style="color: #f4f4f4; user-select: none; pointer-events: none;">Jawaban: <span id="userAnswers"></span></div>
+        </div>
+
+        <div id="question" class="hidden"></div>
+
+        <div class="options1 options turun hidden">
+            <button id="optionA" onclick="submitAnswer('A')"></button>
+            <button id="optionB" onclick="submitAnswer('B')"></button>
+            <button id="optionC" onclick="submitAnswer('C')"></button>
+            <button id="optionD" onclick="submitAnswer('D')"></button>
+            <button id="optionE" onclick="submitAnswer('E')"></button>
+            <button id="optionF" onclick="submitAnswer('F')"></button>
+            <button id="optionG" onclick="submitAnswer('G')"></button>
+            <button id="optionH" onclick="submitAnswer('H')"></button>
+        </div>
+
+        <div id="loading-message" style="display:none;">Mengirim data ke server...</div>
+        <div id="success-message" style="display:none;"></div>
+        <div id="error-message" style="display:none;"></div>
+    </div>
+
+    <script>
+        let currentQuestionIndex = 0;
+        let questions = [];
+        let userAnswers = [];
+
+        // Dapatkan nilai 'kolom' dari URL, tidak ada nilai default
+        const urlParams = new URLSearchParams(window.location.search);
+        const kol = urlParams.get('kolom'); // Nilai 'kolom' sebagai string
+
+        // Konfigurasi API untuk menyimpan hasil
+        const API_URL = 'https://lidan-co-id.pages.dev/api/contacts_filter_dinamis';
+        const TABLE_NAME = 'nilai1';
+        const ID_TO_UPDATE = parseInt(localStorage.getItem('id_x')); // ID data yang akan di-update
+
+        // Kunci localStorage untuk menyimpan kemajuan
+        const LOCAL_STORAGE_KEY = `whoQuizProgress_kolom_${kol}`;
+        const LOCAL_STORAGE_ANSWERS_KEY = `whoQuizAnswers_kolom_${kol}`; // Kunci baru untuk menyimpan jawaban
+        const LOCAL_STORAGE_COMPLETED_KEY = `whoQuizCompleted_kolom_${kol}`; // Kunci untuk menandai selesai
+
+        // Fungsi untuk mengambil data dari file berdasarkan URL
+        function loadQuestions() {
+            // Periksa apakah parameter 'kolom' ada
+            if (!kol) {
+                document.getElementById("question").innerHTML = "Gagal memuat soal. Mohon masukkan parameter kolom di URL. Contoh: ?kolom=20";
+                document.getElementById("startButton").style.display = 'none'; // Sembunyikan tombol mulai
+                return; // Berhenti jika tidak ada parameter
+            }
+
+            // Cek apakah kuis sudah selesai sebelum memuat pertanyaan
+            const isCompleted = localStorage.getItem(LOCAL_STORAGE_COMPLETED_KEY);
+            if (isCompleted === 'true') {
+                endGame(true); // Langsung panggil endGame untuk menampilkan pesan selesai
+                return;
+            }
+
+            document.getElementById("question").innerHTML = "Memuat soal...";
+
+            // Menggunakan jalur URL absolut untuk mengambil file
+            const apiUrl = `https://latihan1.pages.dev/01/who/${kol}.txt`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal memuat pertanyaan dari ' + apiUrl + ': ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    questions = data;
+                    // Setelah pertanyaan dimuat, coba muat kemajuan dan jawaban dari localStorage
+                    loadProgress();
+                    // Kemudian tampilkan pertanyaan pertama (atau yang terakhir dikerjakan)
+                    newQuestion();
+                })
+                .catch(error => {
+                    console.error('Error fetching the questions:', error);
+                    document.getElementById('question').innerHTML = 'Gagal memuat pertanyaan. Periksa apakah file ' + apiUrl + ' ada.';
+                });
+        }
+
+        // Fungsi untuk memuat kemajuan dari localStorage
+        function loadProgress() {
+            // Kita sudah cek isCompleted di loadQuestions, jadi di sini hanya fokus pada progress dan answers
+            const savedIndex = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (savedIndex !== null) {
+                const parsedIndex = parseInt(savedIndex);
+                // Pastikan indeks yang disimpan valid dan tidak melebihi jumlah pertanyaan
+                if (!isNaN(parsedIndex) && parsedIndex < questions.length) {
+                    currentQuestionIndex = parsedIndex;
+                }
+            }
+
+            const savedAnswers = localStorage.getItem(LOCAL_STORAGE_ANSWERS_KEY);
+            if (savedAnswers !== null) {
+                try {
+                    userAnswers = JSON.parse(savedAnswers);
+                    document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+                } catch (e) {
+                    console.error("Error parsing saved answers from localStorage:", e);
+                    userAnswers = []; // Reset jika ada error parsing
+                }
+            }
+        }
+
+        // Fungsi untuk menyimpan kemajuan ke localStorage
+        function saveProgress() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, currentQuestionIndex);
+            localStorage.setItem(LOCAL_STORAGE_ANSWERS_KEY, JSON.stringify(userAnswers));
+        }
+
+        // Fungsi untuk memulai permainan
+        function startGame() {
+            document.getElementById("startButton").style.display = 'none'; // Sembunyikan tombol mulai
+            document.querySelector('h1').style.display = 'none'; // Sembunyikan elemen h1
+            document.querySelector(".options1").classList.remove("hidden");
+            document.getElementById("question").classList.remove("hidden");
+            newQuestion();
+        }
+
+        // Fungsi untuk menampilkan pertanyaan baru
+        function newQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("question").innerHTML = currentQuestion.question;
+
+            const options = currentQuestion.options;
+            const optionButtons = document.querySelectorAll(".options1 button");
+
+            optionButtons.forEach((button, index) => {
+                const optionKey = String.fromCharCode(65 + index);
+                if (options[optionKey] !== undefined) {
+                    button.innerHTML = optionKey + ". " + options[optionKey];
+                    button.style.display = "block";
+                } else {
+                    button.style.display = "none";
+                }
+            });
+        }
+
+        // Fungsi untuk mengirimkan jawaban
+        function submitAnswer(option) {
+            userAnswers.push(option);
+            document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+
+            currentQuestionIndex++;
+            saveProgress(); // Simpan kemajuan dan jawaban setelah menjawab pertanyaan
+
+            // Jika semua pertanyaan sudah dijawab, kirimkan ke API
+            if (currentQuestionIndex >= questions.length) {
+                sendResultToApi(userAnswers.join('; '));
+                endGame(); // Panggil endGame setelah mengirim ke API
+            } else {
+                newQuestion(); // Tampilkan pertanyaan berikutnya jika belum selesai
+            }
+        }
+
+        // Fungsi untuk mengakhiri permainan
+        // Parameter `fromLoadProgress` digunakan untuk membedakan panggilan dari inisialisasi
+        function endGame(fromLoadProgress = false) {
+            document.getElementById("question").innerHTML = "Soal telah selesai, semua telah dikerjakan!";
+            document.querySelector(".options1").classList.add("hidden");
+            document.getElementById("startButton").style.display = 'none'; // Sembunyikan tombol mulai juga
+            document.querySelector(".scoreboard").style.display = 'none'; // Sembunyikan scoreboard
+
+            console.log("Semua jawaban:", userAnswers);
+            
+            // Tandai kuis sebagai selesai di localStorage hanya jika bukan dari loadProgress
+            if (!fromLoadProgress) {
+                localStorage.setItem(LOCAL_STORAGE_COMPLETED_KEY, 'true');
+                localStorage.removeItem(LOCAL_STORAGE_KEY); // Hapus progress index setelah kuis selesai
+                localStorage.removeItem(LOCAL_STORAGE_ANSWERS_KEY); // Hapus jawaban juga
+            }
+        }
+
+        // Mengirim hasil kuis ke API dengan memperbarui elemen kolom x_07.
+        async function sendResultToApi(answersString) {
+            const id = ID_TO_UPDATE;
+            const loadingMessage = document.getElementById("loading-message");
+            const successMessage = document.getElementById("success-message");
+            const errorMessage = document.getElementById("error-message");
+
+            loadingMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            try {
+                // Langkah 1: Ambil data yang ada dari API
+                const getUrl = `${API_URL}?table=${TABLE_NAME}&id_x_eq=${id}`;
+                console.log('Fetching existing data from URL:', getUrl);
+                const getResponse = await fetch(getUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Table-Name': TABLE_NAME
+                    }
+                });
+
+                if (!getResponse.ok) {
+                    throw new Error(`Gagal mengambil data dari API, status: ${getResponse.status}`);
+                }
+                const existingData = await getResponse.json();
+
+                if (!existingData.data || existingData.data.length === 0) {
+                    throw new Error('Data tidak ditemukan untuk ID yang diberikan.');
+                }
+
+                // Ambil nilai x_07 yang sudah ada
+                let x07 = existingData.data[0].x_07 || '';
+
+                // Langkah 2 & 3: "Explode" string, perbarui elemen berdasarkan nilai 'kolom'
+                // Jika kolom=0, indeks 0; jika kolom=3, indeks 3, dst.
+                const targetIndex = parseInt(kol); // kol sudah berupa string, parse ke integer
+
+                if (isNaN(targetIndex)) {
+                    throw new Error("Parameter 'kolom' di URL tidak valid atau tidak ada.");
+                }
+
+                let x07Parts = x07.split('|');
+                // Pastikan array cukup besar untuk menampung indeks yang ditargetkan
+                while (x07Parts.length <= targetIndex) {
+                    x07Parts.push('');
+                }
+                x07Parts[targetIndex] = answersString;
+                let newX07Value = x07Parts.join('|');
+                
+                // Langkah 4: Siapkan data untuk permintaan PUT
+                const formData = {
+                    x_07: newX07Value
+                };
+
+                // Langkah 5: Kirim permintaan PUT ke API
+                const putUrl = `${API_URL}?table=${TABLE_NAME}&id_x=${id}`;
+                console.log('Updating data via PUT to URL:', putUrl);
+                console.log('Data to be sent:', formData);
+                
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Table-Name': TABLE_NAME
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!putResponse.ok) {
+                    const errorData = await putResponse.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${putResponse.status}`);
+                }
+
+                const data = await putResponse.json();
+                console.log('Save API response:', data);
+
+                loadingMessage.style.display = 'none';
+                successMessage.innerText = 'Data berhasil disimpan!';
+                successMessage.style.display = 'block';
+
+                // Tambahkan redirect ke index.html setelah sukses
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500); // Redirect setelah 1.5 detik
+                
+            } catch (error) {
+                console.error('Error saving data:', error);
+                loadingMessage.style.display = 'none';
+                errorMessage.innerText = `Error menyimpan data: ${error.message || error}`;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        // Inisialisasi saat halaman dimuat
+        window.onload = function() {
+            // Panggil loadQuestions untuk memulai proses (akan memeriksa status selesai)
+            loadQuestions();
+        };
+    </script>
+</body>
+</html>

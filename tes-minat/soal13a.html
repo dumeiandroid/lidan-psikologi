@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soal Psikotest</title>
+    
+    <link rel="stylesheet" href="css_tes.css">
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1>Kerjakan Dengan Teliti</h1>
+        <button id="startButton" onclick="startGame()">Mulai</button>
+        <div id="question" class="hidden"></div>
+        <div id="timer" class="hidden">Waktu Tersisa: 300 detik</div>
+        <div class="options hidden"></div>
+        <div class="tengah">
+            <button onclick="calculateScore()" class="hidden" id="scoreButton" disabled>Jawab</button>
+            <button onclick="skipQuestion()" class="hidden" id="skipButton">Lewati</button>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Deklarasi variabel
+        let correctScore = 0;
+        let timeLeft = 300;
+        let currentQuestionIndex = 0;
+        let timerInterval;
+        let allSelectedAnswers = [];
+        let quizData = [];
+
+        // Muat status permainan dari localStorage dengan kunci baru
+        function loadGameState() {
+            const savedState = localStorage.getItem('gameState8');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                correctScore = state.correctScore || 0;
+                currentQuestionIndex = state.currentQuestionIndex || 0;
+                allSelectedAnswers = state.allSelectedAnswers || [];
+                timeLeft = state.timeLeft || 300;
+            }
+            loadQuestion();
+        }
+
+        // Simpan status permainan ke localStorage
+        function saveGameState() {
+            const gameState = {
+                correctScore: correctScore,
+                currentQuestionIndex: currentQuestionIndex,
+                allSelectedAnswers: allSelectedAnswers,
+                timeLeft: timeLeft
+            };
+            localStorage.setItem('gameState8', JSON.stringify(gameState));
+        }
+
+        // Ambil data soal dari URL eksternal
+        fetch('https://latihan1.pages.dev/01/test/psikotest/ist5_a.txt?v=' + new Date().getTime())
+            .then(response => response.json())
+            .then(data => {
+                quizData = data;
+                // Muat status permainan hanya setelah soal berhasil diambil
+                loadGameState();
+            })
+            .catch(error => console.error('Error fetching the questions:', error));
+
+        function startGame() {
+            document.getElementById("startButton").disabled = true;
+            document.querySelector(".options").classList.remove("hidden");
+            document.getElementById("question").classList.remove("hidden");
+            document.getElementById("timer").classList.remove("hidden");
+            document.getElementById("scoreButton").classList.remove("hidden");
+            document.getElementById("skipButton").classList.remove("hidden");
+            startTimer();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                timeLeft--;
+                document.getElementById("timer").innerHTML = "Waktu Tersisa: " + timeLeft + " detik";
+                saveGameState();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame(true);
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                endGame(false);
+                return;
+            }
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            document.getElementById("question").innerHTML = currentQuestion.question;
+            
+            const optionsDiv = document.querySelector(".options");
+            optionsDiv.innerHTML = "";
+
+            currentQuestion.options.forEach((option, index) => {
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.id = `option${index}`;
+                checkbox.value = option;
+                
+                // Tambahkan event listener untuk mengaktifkan tombol "Jawab"
+                checkbox.addEventListener('change', function() {
+                    const checkedCheckboxes = Array.from(document.querySelectorAll('.options input[type="checkbox"]:checked'));
+                    // Logika asli user: mengaktifkan tombol jika ada minimal 2 checkbox yang dipilih
+                    // Ini mungkin tidak cocok dengan soal 'Ya'/'Tidak', tetapi kode asli dipertahankan
+                    document.getElementById("scoreButton").disabled = checkedCheckboxes.length < 2; 
+                });
+
+                const label = document.createElement("label");
+                label.htmlFor = `option${index}`;
+                label.innerHTML = option;
+
+                optionsDiv.appendChild(checkbox);
+                optionsDiv.appendChild(label);
+                optionsDiv.appendChild(document.createElement("br"));
+            });
+            
+            document.getElementById("scoreButton").disabled = true;
+        }
+
+        function skipQuestion() {
+            // Duplikasi soal yang dilewati ke akhir array
+            quizData.push(quizData[currentQuestionIndex]);
+            currentQuestionIndex++;
+            loadQuestion();
+            saveGameState();
+        }
+
+        function calculateScore() {
+            const selectedAnswers = [];
+            const currentQuestion = quizData[currentQuestionIndex];
+            const correctAnswers = currentQuestion.correctAnswers;
+
+            const checkboxes = document.querySelectorAll(`input[type='checkbox']:checked`);
+            checkboxes.forEach(checkbox => {
+                selectedAnswers.push(checkbox.value);
+            });
+
+            // Format jawaban untuk logging
+            const questionNumber = currentQuestionIndex + 1;
+            const formattedAnswers = selectedAnswers.map(answer => {
+                const isCorrect = correctAnswers.includes(answer);
+                // Asumsi format jawaban adalah huruf tunggal 'A' atau 'B'
+                return `${questionNumber}${answer.slice(-1)} ${isCorrect ? 'v' : 'x'}`;
+            });
+            allSelectedAnswers.push(formattedAnswers);
+
+            // Evaluasi hasil
+            const isCorrect = selectedAnswers.length === correctAnswers.length &&
+                              selectedAnswers.every(ans => correctAnswers.includes(ans));
+
+            if (isCorrect) {
+                correctScore++;
+            }
+
+            currentQuestionIndex++;
+            loadQuestion();
+            saveGameState();
+        }
+
+        function endGame(timeout) {
+            clearInterval(timerInterval);
+            
+            // Log hasil ke konsol karena tidak ada server untuk mengirim data
+            console.log("Quiz completed!");
+            console.log("Final Correct Score:", correctScore);
+            console.log("All User Answers:", JSON.stringify(allSelectedAnswers));
+
+            document.getElementById("result").innerHTML = `Quiz Selesai! Skor Anda: ${correctScore}/${quizData.length}`;
+            if (timeout) {
+                document.getElementById("question").innerHTML = "Waktu Habis! Semua soal telah dikerjakan atau dilewati.";
+            } else {
+                document.getElementById("question").innerHTML = "Soal telah selesai, semua telah dikerjakan!";
+            }
+
+            // Sembunyikan opsi dan tombol
+            document.querySelector(".options").classList.add("hidden");
+            document.getElementById("scoreButton").classList.add("hidden");
+            document.getElementById("skipButton").classList.add("hidden");
+            
+            // Hapus status permainan setelah selesai
+            localStorage.removeItem('gameState8');
+        }
+
+        // Atur tombol "Mulai" agar dapat diklik saat halaman dimuat
+        window.onload = function() {
+            document.getElementById("startButton").disabled = false;
+        };
+    </script>
+
+</body>
+</html>

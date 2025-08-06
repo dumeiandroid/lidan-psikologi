@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Soal Interaktif</title>
+    <!-- Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk ikon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Font Inter dari Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl">
+        <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
+            <!-- Header Card -->
+            <div class="bg-blue-600 text-white p-6 rounded-t-2xl flex items-center justify-between">
+                <h4 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-question-circle mr-3"></i>
+                    <span>Pilih Soal Berikutnya</span>
+                </h4>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-6">
+                <!-- Kontainer Pesan (untuk loading atau error) -->
+                <div id="messageContainer" class="text-center text-gray-500 py-8">
+                    <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                    <p class="text-lg">Memuat status soal...</p>
+                </div>
+
+                <!-- Kontainer Tombol Aksi -->
+                <div id="buttonContainer" class="hidden flex justify-center mt-4">
+                    <!-- Tombol akan di-generate di sini secara dinamis -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Alert (untuk notifikasi) -->
+    <div id="alertModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
+            <div id="alertIcon" class="text-4xl text-center mb-4"></div>
+            <p id="alertMessage" class="text-lg text-center font-medium"></p>
+            <div class="mt-6 text-center">
+                <button onclick="closeAlert()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Konfigurasi Aplikasi ---
+        const currentTable = 'nilai1'; // Nama tabel yang akan diakses
+        const apiUrl = 'https://lidan-co-id.pages.dev/api/contacts_filter_dinamis'; // URL API
+        const dataToFetchId = 1; // ID data yang akan diambil untuk pemeriksaan status
+
+        // --- Event Listener Dokumen ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Muat data dan tampilkan tombol saat halaman dimuat
+            loadDataAndDisplayButtons(dataToFetchId);
+        });
+
+        // --- Fungsi Utama ---
+
+        /**
+         * Memuat data tunggal dari API dan menampilkan tombol soal yang sesuai
+         * berdasarkan kondisi kolom yang kosong.
+         * @param {number} id - ID data yang akan dimuat.
+         */
+        async function loadDataAndDisplayButtons(id) {
+            const messageContainer = document.getElementById('messageContainer');
+            const buttonContainer = document.getElementById('buttonContainer');
+
+            // Tampilkan pesan loading dan sembunyikan kontainer tombol
+            messageContainer.classList.remove('hidden');
+            buttonContainer.classList.add('hidden');
+
+            const url = `${apiUrl}?table=${currentTable}&id_x_eq=${id}`;
+            console.log('Fetching data from URL:', url);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'X-Table-Name': currentTable }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Received data:', data);
+
+                if (data.success && data.data && data.data.length > 0) {
+                    const item = data.data[0];
+                    // Mengambil nilai dari kolom 'x_05' yang berisi data kolom dan baris
+                    const rawValue = item['x_05'];
+                    // Memecah string 'x_05' menjadi array kolom berdasarkan delimiter '|'
+                    const explodedColumns = rawValue ? rawValue.split('|') : [];
+
+                    let buttonHtml = '';
+                    let message = '';
+
+                    /**
+                     * Helper function untuk mendapatkan nilai baris pertama dari kolom tertentu.
+                     * @param {number} colIndex - Indeks kolom (0-based).
+                     * @returns {string} Nilai baris pertama yang sudah di-trim, atau string kosong jika tidak ada.
+                     */
+                    const getFirstRowValue = (colIndex) => {
+                        if (explodedColumns[colIndex]) {
+                            return explodedColumns[colIndex].split(';')[0].trim();
+                        }
+                        return '';
+                    };
+
+                    // Logika kondisional untuk menampilkan tombol
+                    if (getFirstRowValue(0) === '') { // Kolom 1 (index 0), Baris 1 kosong
+                        buttonHtml = createButton('soal01.html', 'Lanjutkan ke Soal 01', 'bg-blue-500');
+                    } else if (getFirstRowValue(1) === '') { // Kolom 2 (index 1), Baris 1 kosong
+                        buttonHtml = createButton('soal02.html', 'Lanjutkan ke Soal 02', 'bg-blue-500');
+                    } else if (getFirstRowValue(2) === '') { // Kolom 3 (index 2), Baris 1 kosong
+                        buttonHtml = createButton('soal03.html', 'Lanjutkan ke Soal 03', 'bg-blue-500');
+                    } else if (getFirstRowValue(3) === '') { // Kolom 4 (index 3), Baris 1 kosong
+                        buttonHtml = createButton('soal04.html', 'Lanjutkan ke Soal 04', 'bg-blue-500');
+                    } else if (getFirstRowValue(15) === '') { // Kolom 16 (index 15), Baris 1 kosong
+                        buttonHtml = createButton('soal05.html', 'Lanjutkan ke Soal 05', 'bg-purple-500');
+                    } else if (getFirstRowValue(17) === '') { // Kolom 18 (index 17), Baris 1 kosong
+                        buttonHtml = createButton('soal06.html', 'Lanjutkan ke Soal 06', 'bg-purple-500');
+                    } else {
+                        message = 'Selamat! Semua soal yang tersedia telah diselesaikan.';
+                    }
+
+                    // Tampilkan tombol atau pesan akhir
+                    if (buttonHtml) {
+                        buttonContainer.innerHTML = buttonHtml;
+                        buttonContainer.classList.remove('hidden');
+                        messageContainer.classList.add('hidden'); // Sembunyikan pesan loading/error
+                    } else {
+                        showMessage(message, 'info'); // Tampilkan pesan jika tidak ada tombol
+                    }
+
+                } else {
+                    showMessage('Data tidak ditemukan atau kosong. Silakan periksa respons API di konsol.', 'warning');
+                }
+            } catch (error) {
+                console.error('Error memuat data:', error);
+                showMessage(`Error memuat data: ${error.message || error}`, 'danger');
+            }
+        }
+
+        /**
+         * Helper function untuk membuat elemen tombol/link.
+         * @param {string} href - URL tujuan link.
+         * @param {string} text - Teks yang akan ditampilkan di tombol.
+         * @param {string} bgColorClass - Kelas warna latar belakang Tailwind CSS (misal: 'bg-blue-500').
+         * @returns {string} String HTML untuk tombol.
+         */
+        function createButton(href, text, bgColorClass) {
+            return `
+                <a href="${href}" class="${bgColorClass} hover:${bgColorClass.replace('500', '600')} text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 transform hover:scale-104 flex items-center justify-center">
+                    <i class="fas fa-arrow-right mr-2"></i>${text}
+                </a>
+            `;
+        }
+
+        /**
+         * Menampilkan pesan di modal alert.
+         * @param {string} message - Pesan yang akan ditampilkan.
+         * @param {string} type - Tipe alert ('success', 'danger', 'info', 'warning').
+         */
+        function showAlert(message, type) {
+            const modal = document.getElementById('alertModal');
+            const alertMessage = document.getElementById('alertMessage');
+            const alertIcon = document.getElementById('alertIcon');
+
+            alertMessage.textContent = message;
+            alertIcon.innerHTML = ''; // Bersihkan ikon sebelumnya
+            alertIcon.className = 'text-4xl text-center mb-4'; // Reset kelas
+
+            switch (type) {
+                case 'success':
+                    alertIcon.classList.add('text-green-500');
+                    alertIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    break;
+                case 'danger':
+                    alertIcon.classList.add('text-red-500');
+                    alertIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                    break;
+                case 'warning':
+                    alertIcon.classList.add('text-yellow-500');
+                    alertIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    break;
+                case 'info':
+                default:
+                    alertIcon.classList.add('text-blue-500');
+                    alertIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                    break;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        /**
+         * Menutup modal alert.
+         */
+        function closeAlert() {
+            const modal = document.getElementById('alertModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        /**
+         * Menampilkan pesan di kontainer utama saat memuat atau error.
+         * @param {string} message - Pesan yang akan ditampilkan.
+         * @param {string} type - Tipe pesan ('danger', 'warning', 'info').
+         */
+        function showMessage(message, type) {
+            const messageContainer = document.getElementById('messageContainer');
+            const buttonContainer = document.getElementById('buttonContainer');
+            
+            messageContainer.classList.remove('hidden');
+            buttonContainer.classList.add('hidden');
+
+            let iconHtml = '';
+            let textColor = '';
+
+            if (type === 'danger') {
+                iconHtml = '<i class="fas fa-times-circle text-red-500 text-4xl mb-4"></i>';
+                textColor = 'text-red-500';
+            } else if (type === 'warning') {
+                iconHtml = '<i class="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>';
+                textColor = 'text-yellow-500';
+            } else if (type === 'info') {
+                iconHtml = '<i class="fas fa-info-circle text-blue-500 text-4xl mb-4"></i>';
+                textColor = 'text-blue-500';
+            } else { // Default ke info jika tipe tidak dikenal
+                iconHtml = '<i class="fas fa-info-circle text-gray-500 text-4xl mb-4"></i>';
+                textColor = 'text-gray-500';
+            }
+
+            messageContainer.innerHTML = `${iconHtml}<p class="text-lg ${textColor}">${message}</p>`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soal Psikotest</title>
+    <!-- Memuat file CSS eksternal sesuai permintaan -->
+    <link rel="stylesheet" href="css_tes.css">
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1>Kerjakan Dengan Teliti</h1>
+        <button id="startButton" onclick="startGame()">Mulai</button>
+        <div id="question" class="hidden"></div>
+
+        <div class="options1 options turun hidden">
+            <button style="text-align: left;" id="optionA" onclick="submitAnswer('A')"></button>
+            <button style="text-align: left;" id="optionB" onclick="submitAnswer('B')"></button>
+            <button id="optionC" onclick="submitAnswer('C')"></button>
+            <button id="optionD" onclick="submitAnswer('D')"></button>
+            <button id="optionE" onclick="submitAnswer('E')"></button>
+            <button id="optionF" onclick="submitAnswer('F')"></button>
+            <button id="optionG" onclick="submitAnswer('G')"></button>
+            <button id="optionH" onclick="submitAnswer('H')"></button>
+        </div>
+
+        <div class="scoreboard putih">
+            <!-- Jawaban pengguna ditampilkan di sini -->
+            <div style="color: #f4f4f4; user-select: none; pointer-events: none;">Jawaban: <span id="userAnswers"></span></div>
+        </div>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Deklarasi variabel untuk mengelola status permainan
+        let currentQuestionIndex = 0;
+        let questions = [];
+        let userAnswers = [];
+
+        // URL dasar untuk mengambil data
+        const baseTestUrl = 'https://latihan1.pages.dev/01/test/';
+
+        // Muat status permainan dari localStorage saat halaman dimuat
+        function loadGameState() {
+            const savedState = localStorage.getItem('gameWwq');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                currentQuestionIndex = state.currentQuestionIndex || 0;
+                userAnswers = state.userAnswers || [];
+                // Tampilkan jawaban yang sudah disimpan
+                document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+            }
+        }
+
+        // Simpan status permainan ke localStorage
+        function saveGameState() {
+            const gameState = {
+                currentQuestionIndex: currentQuestionIndex,
+                userAnswers: userAnswers
+            };
+            localStorage.setItem('gameWwq', JSON.stringify(gameState));
+        }
+
+        // Muat pertanyaan dari file JSON
+        fetch(baseTestUrl + 'psikotest/wwq.txt?v=' + new Date().getTime())
+            .then(response => response.json())
+            .then(data => {
+                questions = data;
+                loadGameState(); // Muat status permainan setelah data berhasil dimuat
+            })
+            .catch(error => console.error('Error fetching the questions:', error));
+
+        // Memulai permainan
+        function startGame() {
+            document.getElementById("startButton").disabled = true; // Nonaktifkan tombol Start
+            document.querySelector(".options1").classList.remove("hidden"); // Tampilkan opsi
+            document.getElementById("question").classList.remove("hidden"); // Tampilkan pertanyaan
+            newQuestion();
+        }
+
+        // Memuat soal baru
+        function newQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame();
+                return;
+            }
+            
+            // Ambil pertanyaan berdasarkan indeks saat ini
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("question").innerHTML = currentQuestion.question;
+
+            // Mengatur opsi jawaban secara dinamis
+            const options = currentQuestion.options;
+            const optionButtons = document.querySelectorAll(".options1 button");
+
+            optionButtons.forEach((button, index) => {
+                const optionKey = String.fromCharCode(65 + index); // Menghasilkan 'A', 'B', 'C', ...
+                if (options[optionKey] !== undefined) {
+                    button.innerHTML = optionKey + ". " + options[optionKey];
+                    button.style.display = "inline-block"; // Tampilkan tombol
+                } else {
+                    button.style.display = "none"; // Sembunyikan tombol jika tidak ada
+                }
+            });
+        }
+
+        // Mengirim jawaban yang dipilih
+        function submitAnswer(option) {
+            userAnswers.push(option); // Simpan jawaban pengguna
+            document.getElementById("userAnswers").innerHTML = userAnswers.join('; '); // Tampilkan jawaban dengan pemisah ;
+
+            currentQuestionIndex++; // Pindah ke pertanyaan berikutnya
+            saveGameState(); // Simpan status permainan setelah menjawab
+            newQuestion();
+        }
+
+        // Mengakhiri permainan
+        function endGame() {
+            document.getElementById("question").innerHTML = "Soal telah selesai, semua telah dikerjakan!";
+            document.querySelector(".options1").classList.add("hidden");
+            document.querySelectorAll(".options1 button").forEach(button => button.disabled = true);
+
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = `Tes Selesai! Jawaban Anda: ${userAnswers.join('; ')}`;
+
+            // Log hasil ke konsol karena tidak ada server untuk mengirim data
+            console.log("Quiz completed!");
+            console.log("All User Answers:", JSON.stringify(userAnswers));
+            
+            // Hapus status permainan setelah selesai
+            localStorage.removeItem('gameWwq');
+        }
+    </script>
+
+</body>
+</html>

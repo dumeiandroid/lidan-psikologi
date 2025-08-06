@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soal Psikotest</title>
+    <script>
+        if (!localStorage.getItem('user')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #startButton {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #585353;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #startButton:hover {
+            background-color: #050000;
+        }
+
+        #question {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+        
+        .options1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .options1 button {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        .options1 button:hover {
+            background-color: #e2e2e2;
+            transform: translateY(-2px);
+        }
+
+        .scoreboard {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #585353;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 1em;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        /* Prevent text selection */
+        .options {
+            user-select: none;
+        }
+        .scoreboard {
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* Responsive design for larger screens */
+        @media (min-width: 601px) {
+            #question {
+                font-size: 1.5em;
+            }
+            .options1 button {
+                width: 60%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button id="startButton" onclick="startGame()">Mulai</button>
+    <h1>Kerjakan Dengan Teliti</h1>
+
+    <div id="question" class="hidden"></div>
+    <div class="options1 options turun hidden">
+        <button style="text-align: left;" id="optionA" onclick="submitAnswer('A')"></button>
+        <button style="text-align: left;" id="optionB" onclick="submitAnswer('B')"></button>
+    </div>
+    
+    <div class="scoreboard putih">
+        <div style="color: #f4f4f4; user-select: none; pointer-events: none;">Jawaban: <span id="userAnswers"></span></div>
+    </div>
+    
+    <div id="statusMessage" style="text-align: center; margin-top: 20px; font-weight: bold;"></div>
+
+
+    <script>
+        let currentQuestionIndex = 0; // Menyimpan indeks pertanyaan saat ini
+        let questions = []; // Variabel untuk menyimpan pertanyaan yang diambil
+        let userAnswers = []; // Array untuk menyimpan jawaban pengguna
+
+        // Konfigurasi API untuk menyimpan hasil
+        const API_URL = 'https://lidan-co-id.pages.dev/api/contacts_filter_dinamis';
+        const TABLE_NAME = 'nilai1';
+        const ID_TO_UPDATE = parseInt(localStorage.getItem('id_x')); // ID data yang akan di-update
+
+        // Muat pertanyaan dari file JSON
+        fetch('https://latihan1.pages.dev/01/test/psikotest/epps.txt?v=' + new Date().getTime())
+            .then(response => response.json())
+            .then(data => {
+                questions = data;
+                loadGameState(); // Memuat status permainan setelah data berhasil dimuat
+            })
+            .catch(error => console.error('Error fetching the questions:', error));
+
+        // Muat status permainan dari localStorage
+        function loadGameState() {
+            const savedState = localStorage.getItem('gameEpps');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                currentQuestionIndex = state.currentQuestionIndex || 0;
+                userAnswers = state.userAnswers || [];
+                document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+            }
+            newQuestion();
+        }
+
+        // Simpan status permainan ke localStorage
+        function saveGameState() {
+            const gameState = {
+                currentQuestionIndex: currentQuestionIndex,
+                userAnswers: userAnswers
+            };
+            localStorage.setItem('gameEpps', JSON.stringify(gameState));
+        }
+
+        function startGame() {
+            document.getElementById("startButton").disabled = true;
+            document.querySelector(".options1").classList.remove("hidden");
+            document.getElementById("question").classList.remove("hidden");
+            // newQuestion() dipanggil oleh loadGameState yang dipanggil setelah fetch berhasil
+        }
+
+        function newQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame(false);
+                return;
+            }
+            
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("question").innerHTML = currentQuestion.question;
+
+            // Mengatur opsi jawaban secara dinamis
+            const options = currentQuestion.options;
+            const optionKeys = Object.keys(options);
+            const optionButtons = document.querySelectorAll(".options1 button");
+
+            optionButtons.forEach((button, index) => {
+                if (index < optionKeys.length) {
+                    const optionKey = optionKeys[index];
+                    button.innerHTML = optionKey + ". " + options[optionKey];
+                    button.style.display = "block"; // Use 'block' for full width buttons
+                    button.setAttribute('onclick', `submitAnswer('${optionKey}')`);
+                } else {
+                    button.style.display = "none";
+                }
+            });
+        }
+
+        function submitAnswer(option) {
+            userAnswers.push(option);
+            document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+            saveGameState();
+            currentQuestionIndex++;
+            newQuestion();
+        }
+
+        // Fungsi untuk mengirim hasil ke API
+        async function sendResultToApi(answersString) {
+            const statusMessage = document.getElementById("statusMessage");
+            statusMessage.style.color = "blue";
+            statusMessage.innerText = "Mengirim data ke server...";
+
+            try {
+                // Siapkan data untuk permintaan PUT
+                const formData = {
+                    x_06: answersString
+                };
+
+                // Kirim permintaan PUT ke API
+                const putUrl = `${API_URL}?table=${TABLE_NAME}&id_x=${ID_TO_UPDATE}`;
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Table-Name': TABLE_NAME
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!putResponse.ok) {
+                    const errorData = await putResponse.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${putResponse.status}`);
+                }
+
+                statusMessage.style.color = "green";
+                statusMessage.innerText = "Data berhasil disimpan!";
+                
+            } catch (error) {
+                console.error('Error saving data:', error);
+                statusMessage.style.color = "red";
+                statusMessage.innerText = `Error menyimpan data: ${error.message || error}`;
+            }
+        }
+        
+        function endGame(timeout) {
+            // Display a final message to the user
+            document.getElementById("question").innerHTML = timeout ? "Waktu Habis!" : "Soal telah selesai, semua telah dikerjakan!";
+            document.querySelectorAll(".options1 button").forEach(button => button.disabled = true);
+            document.querySelector('.options1').classList.add('hidden');
+            
+            // Gabungkan semua jawaban menjadi satu string
+            const finalAnswersString = userAnswers.join(';');
+            
+            // Kirim hasil ke API
+            sendResultToApi(finalAnswersString);
+
+            // Hapus status game dari localStorage
+            localStorage.removeItem('gameEpps');
+
+            // Redirect to index.html after a delay
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 3000); // Tunggu 3 detik untuk menampilkan pesan status
+        }
+
+        // Set up the button to be initially clickable
+        window.onload = function() {
+            document.getElementById("startButton").disabled = false;
+        };
+    </script>
+</body>
+</html>

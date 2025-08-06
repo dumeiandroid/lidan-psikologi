@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen LocalStorage</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; /* Menggunakan font Inter */
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px; /* Sudut membulat */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 12px 25px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px; /* Sudut membulat */
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .delete-all {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .delete-all:hover {
+            background-color: #c0392b;
+        }
+        .refresh-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        .refresh-btn:hover {
+            background-color: #2980b9;
+        }
+        .add-item-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .add-item-btn:hover {
+            background-color: #27ae60;
+        }
+        .list-item {
+            display: flex;
+            flex-wrap: wrap; /* Mengizinkan wrap untuk responsif */
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            background-color: #fdfdfd;
+            border-radius: 8px; /* Sudut membulat */
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        .item-details {
+            flex-grow: 1;
+            margin-right: 10px;
+            word-break: break-all; /* Memastikan teks panjang tidak meluber */
+        }
+        .item-details strong {
+            color: #34495e;
+            font-size: 1.1em;
+        }
+        .item-details span {
+            display: block;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .delete-item {
+            background-color: #f39c12;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+        .delete-item:hover {
+            background-color: #e67e22;
+        }
+        #localStorageList p {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 20px;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .input-group input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .modal-content button {
+            margin: 10px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-confirm {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .modal-cancel {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        /* Responsif */
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            .item-details {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Manajemen Kunci LocalStorage</h1>
+
+        <div class="input-group">
+            <input type="text" id="keyInput" placeholder="Masukkan Kunci Baru">
+            <input type="text" id="valueInput" placeholder="Masukkan Nilai Baru">
+            <button class="add-item-btn" onclick="addLocalStorageItem()">Tambah Kunci</button>
+        </div>
+
+        <div class="button-group">
+            <button class="delete-all" onclick="showClearAllConfirmation()">Hapus Semua Kunci</button>
+            <button class="refresh-btn" onclick="displayLocalStorage()">Segarkan Daftar</button>
+        </div>
+
+        <h2>Daftar Kunci & Nilai</h2>
+        <div id="localStorageList"></div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus Semua -->
+    <div id="clearAllModal" class="modal">
+        <div class="modal-content">
+            <h3>Apakah Anda yakin ingin menghapus semua kunci LocalStorage?</h3>
+            <button class="modal-confirm" onclick="clearAllLocalStorage()">Ya, Hapus</button>
+            <button class="modal-cancel" onclick="hideClearAllConfirmation()">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk menampilkan daftar kunci dan nilai LocalStorage
+        function displayLocalStorage() {
+            const listDiv = document.getElementById('localStorageList');
+            listDiv.innerHTML = ''; // Kosongkan daftar sebelum diisi ulang
+
+            if (localStorage.length === 0) {
+                listDiv.innerHTML = '<p>Tidak ada kunci di LocalStorage.</p>';
+                return;
+            }
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key); // Mengambil nilai
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'list-item';
+                itemDiv.innerHTML = `
+                    <div class="item-details">
+                        <strong>${key}</strong>
+                        <span>Nilai: ${value}</span>
+                    </div>
+                    <button class="delete-item" onclick="deleteLocalStorageItem('${key}')">Hapus</button>
+                `;
+                listDiv.appendChild(itemDiv);
+            }
+        }
+
+        // Fungsi untuk menghapus item LocalStorage berdasarkan kunci
+        function deleteLocalStorageItem(key) {
+            localStorage.removeItem(key);
+            displayLocalStorage(); // Perbarui tampilan setelah menghapus
+        }
+
+        // Fungsi untuk menambahkan item baru ke LocalStorage
+        function addLocalStorageItem() {
+            const keyInput = document.getElementById('keyInput');
+            const valueInput = document.getElementById('valueInput');
+            const key = keyInput.value.trim();
+            const value = valueInput.value.trim();
+
+            if (key && value) {
+                localStorage.setItem(key, value);
+                keyInput.value = ''; // Kosongkan input
+                valueInput.value = ''; // Kosongkan input
+                displayLocalStorage(); // Perbarui tampilan
+            } else {
+                // Menggunakan modal kustom sebagai pengganti alert()
+                showCustomAlert('Kunci dan Nilai tidak boleh kosong!');
+            }
+        }
+
+        // Fungsi untuk menampilkan modal konfirmasi hapus semua
+        function showClearAllConfirmation() {
+            document.getElementById('clearAllModal').style.display = 'flex';
+        }
+
+        // Fungsi untuk menyembunyikan modal konfirmasi hapus semua
+        function hideClearAllConfirmation() {
+            document.getElementById('clearAllModal').style.display = 'none';
+        }
+
+        // Fungsi untuk menghapus semua kunci LocalStorage
+        function clearAllLocalStorage() {
+            localStorage.clear();
+            displayLocalStorage(); // Perbarui tampilan setelah menghapus semua
+            hideClearAllConfirmation(); // Sembunyikan modal setelah menghapus
+        }
+
+        // Fungsi untuk menampilkan alert kustom (pengganti window.alert)
+        function showCustomAlert(message) {
+            const alertModal = document.createElement('div');
+            alertModal.className = 'modal';
+            alertModal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Peringatan!</h3>
+                    <p>${message}</p>
+                    <button class="modal-confirm" onclick="this.parentNode.parentNode.remove()">OK</button>
+                </div>
+            `;
+            document.body.appendChild(alertModal);
+            alertModal.style.display = 'flex';
+        }
+
+
+        // Tampilkan daftar saat halaman dimuat
+        window.onload = displayLocalStorage;
+    </script>
+
+</body>
+</html>

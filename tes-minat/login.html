@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm">
+        <h2 class="text-3xl font-extrabold text-center text-blue-600 mb-6">Login</h2>
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="paket" class="block text-sm font-medium text-gray-700">Paket:</label>
+                <input type="text" id="paket" name="paket" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="token" class="block text-sm font-medium text-gray-700">Kode Token:</label>
+                <input type="text" id="token" name="token" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <button type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                Login
+            </button>
+        </form>
+        <div id="message" class="mt-4 text-center"></div>
+    </div>
+
+    <script>
+        // URL API for CRUD operations
+        const API_URL = 'https://lidan-co-id.pages.dev/api/contacts_filter_dinamis';
+        const TABLE_NILAI1 = 'nilai1';
+        // Key names for localStorage
+        const NAMA_SESI_TOKEN = 'user';
+        const NAMA_SESI_ID = 'id_x';
+        const NAMA_SESI_PAKET = 'paket';
+
+        /**
+         * Displays a temporary alert message on the screen.
+         * @param {string} msg - The message to display.
+         * @param {string} type - The message type ('success' or 'error').
+         */
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="p-3 rounded-md ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${msg}</div>`;
+        }
+
+        /**
+         * Redirects to the main page after a delay.
+         */
+        function redirectToIndex() {
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+
+        /**
+         * Clears specific localStorage keys related to login.
+         */
+        function clearSpecificStorageKeys() {
+            localStorage.removeItem(NAMA_SESI_TOKEN);
+            localStorage.removeItem(NAMA_SESI_ID);
+            localStorage.removeItem(NAMA_SESI_PAKET);
+        }
+
+        // --- Initial localStorage Check Logic ---
+        // Check if the user is already logged in via localStorage
+        if (localStorage.getItem(NAMA_SESI_TOKEN)) {
+            showMessage('Anda sudah login! Mengalihkan ke halaman utama...', 'success');
+            redirectToIndex();
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            // Clear specific localStorage keys before attempting a new login
+            clearSpecificStorageKeys();
+
+            const paket = document.getElementById('paket').value;
+            const token = document.getElementById('token').value;
+
+            try {
+                // Search for the user token in the `nilai1` table
+                const searchUrl = `${API_URL}?table=${TABLE_NILAI1}&x_01_eq=${token}`;
+                const response = await fetch(searchUrl);
+                const result = await response.json();
+
+                if (response.ok && result.success && result.data.length > 0) {
+                    const userData = result.data[0];
+                    
+                    // Save id_x, token, and package to localStorage
+                    localStorage.setItem(NAMA_SESI_TOKEN, userData.x_01);
+                    localStorage.setItem(NAMA_SESI_ID, userData.id_x);
+                    localStorage.setItem(NAMA_SESI_PAKET, paket);
+
+                    showMessage('Login berhasil! Mengalihkan...', 'success');
+                    redirectToIndex();
+                } else {
+                    showMessage('Token salah. Mohon periksa kembali.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Terjadi kesalahan saat login.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

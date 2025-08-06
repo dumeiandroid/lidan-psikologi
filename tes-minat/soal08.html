@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soal Psikotest</title>
+    <script>
+        if (!localStorage.getItem('user')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <link rel="stylesheet" href="css_tes.css">
+    
+</head>
+<body>
+
+    <div class="keterangan_soal">
+        <h1>Keterangan Soal</h1>
+        <p><span style=\'color: rgb(85, 85, 85); font-size: 19.2px; text-align: justify;\'>Deskripsi berikut ini terdiri dari sejumlah pasangan pernyataan, dan tugas Anda adalah memilih satu pernyataan dalam setiap pasangan yang paling sesuai dengan diri Anda. Petunjuk Pengerjaan:&nbsp;</span></p><p><span style=\'color: rgb(85, 85, 85); font-size: 19.2px; text-align: justify;\'>(1) Setiap item memiliki dua pernyataan (a dan b).&nbsp;</span></p><p>(2) Bacalah kedua pernyataan dengan cermat.&nbsp;</p><p>(3) Pilih salah satu pernyataan yang paling sesuai dengan kepribadian Anda atau yang paling menggambarkan apa yang Anda sukai atau ingin lakukan.&nbsp;</p><p>(4) Tidak ada jawaban \"benar\" atau \"salah\". Jawablah secara jujur dan sesuai dengan diri Anda sendiri, bukan sesuai dengan apa yang Anda pikirkan diharapkan oleh orang lain.&nbsp;</p><p>(5) Usahakan untuk tidak memilih berdasarkan apa yang menurut Anda benar secara sosial, tetapi berdasarkan apa yang benar-benar mencerminkan diri Anda.&nbsp;</p><p>(6) Jika kedua pernyataan dalam satu item terasa sulit dipilih, tetap pilih salah satu yang lebih mendekati diri Anda.&nbsp;</p><p>(7) Jangan menghabiskan terlalu banyak waktu pada satu item. Jawab dengan spontan dan sesuai dengan perasaan pertama Anda</p>
+        <h2>Contoh 1</h2>
+        <img src="https://latihan1.pages.dev/01/test/gambar/epps_a.png" alt="">
+        <h2>Contoh 2</h2>
+        <img src="https://latihan1.pages.dev/01/test/gambar/epps_b.png" alt="">
+        <h2>Penjelasan Jawaban</h2>
+        <b>Contoh pertama & Kedua</b>
+        <p>Perhatikan penjelasan diatas dan pilihlah salah satu pernyataan A atau B yang paling sesuai dengan diri anda.</p>
+    </div>
+    <h1 class="sembunyikan">Kerjakan Dengan Teliti</h1>
+    <button id="startButton" onclick="startGame()">Mulai</button>
+    <div id="question" class="hidden"></div>
+    <div class="options1 options turun hidden">
+        <button style="text-align: left;" id="optionA" onclick="submitAnswer('A')"></button>
+        <button style="text-align: left;" id="optionB" onclick="submitAnswer('B')"></button>
+    </div>
+    
+    <div class="scoreboard putih">
+        <div style="color: #f4f4f4; user-select: none; pointer-events: none;">Jawaban: <span id="userAnswers"></span></div>
+    </div>
+    
+    <div id="statusMessage" style="text-align: center; margin-top: 20px; font-weight: bold;"></div>
+
+
+    <script>
+        let currentQuestionIndex = 0; // Menyimpan indeks pertanyaan saat ini
+        let questions = []; // Variabel untuk menyimpan pertanyaan yang diambil
+        let userAnswers = []; // Array untuk menyimpan jawaban pengguna
+
+        // Konfigurasi API untuk menyimpan hasil
+        const API_URL = 'https://lidan-co-id.pages.dev/api/contacts_filter_dinamis';
+        const TABLE_NAME = 'nilai1';
+        const ID_TO_UPDATE = parseInt(localStorage.getItem('id_x')); // ID data yang akan di-update
+
+        // Muat pertanyaan dari file JSON
+        fetch('https://latihan1.pages.dev/01/test/psikotest/epps.txt?v=' + new Date().getTime())
+        .then(response => response.json())
+        .then(data => {
+            questions = data;
+                loadGameState(); // Memuat status permainan setelah data berhasil dimuat
+            })
+        .catch(error => console.error('Error fetching the questions:', error));
+
+        // Muat status permainan dari localStorage
+        function loadGameState() {
+            const savedState = localStorage.getItem('gameEpps');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                currentQuestionIndex = state.currentQuestionIndex || 0;
+                userAnswers = state.userAnswers || [];
+                document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+            }
+            // newQuestion() TIDAK dipanggil di sini lagi
+        }
+
+        // Simpan status permainan ke localStorage
+        function saveGameState() {
+            const gameState = {
+                currentQuestionIndex: currentQuestionIndex,
+                userAnswers: userAnswers
+            };
+            localStorage.setItem('gameEpps', JSON.stringify(gameState));
+        }
+
+        function startGame() {
+            document.querySelector(".sembunyikan").classList.add("hidden");
+            document.querySelector(".keterangan_soal").classList.add("hidden");
+            document.getElementById("startButton").disabled = true;
+            document.querySelector(".options1").classList.remove("hidden");
+            document.getElementById("question").classList.remove("hidden");
+            newQuestion(); // Panggil newQuestion HANYA saat tombol "Mulai" diklik
+        }
+
+        function newQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame(false);
+                return;
+            }
+            
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("question").innerHTML = currentQuestion.question;
+
+            // Mengatur opsi jawaban secara dinamis
+            const options = currentQuestion.options;
+            const optionKeys = Object.keys(options);
+            const optionButtons = document.querySelectorAll(".options1 button");
+
+            optionButtons.forEach((button, index) => {
+                if (index < optionKeys.length) {
+                    const optionKey = optionKeys[index];
+                    button.innerHTML = optionKey + ". " + options[optionKey];
+                    button.style.display = "block"; // Use 'block' for full width buttons
+                    button.setAttribute('onclick', `submitAnswer('${optionKey}')`);
+                } else {
+                    button.style.display = "none";
+                }
+            });
+        }
+
+        function submitAnswer(option) {
+            userAnswers.push(option);
+            document.getElementById("userAnswers").innerHTML = userAnswers.join('; ');
+            currentQuestionIndex++; // Pindahkan ke indeks pertanyaan berikutnya
+            saveGameState(); // Pindahkan ke sini, setelah currentQuestionIndex di-update
+            newQuestion();
+        }
+
+        // Fungsi untuk mengirim hasil ke API
+        async function sendResultToApi(answersString) {
+            const statusMessage = document.getElementById("statusMessage");
+            statusMessage.style.color = "blue";
+            statusMessage.innerText = "Mengirim data ke server...";
+
+            try {
+                // Siapkan data untuk permintaan PUT
+                const formData = {
+                    x_06: answersString
+                };
+
+                // Kirim permintaan PUT ke API
+                const putUrl = `${API_URL}?table=${TABLE_NAME}&id_x=${ID_TO_UPDATE}`;
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Table-Name': TABLE_NAME
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!putResponse.ok) {
+                    const errorData = await putResponse.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${putResponse.status}`);
+                }
+
+                statusMessage.style.color = "green";
+                statusMessage.innerText = "Data berhasil disimpan!";
+                
+            } catch (error) {
+                console.error('Error saving data:', error);
+                statusMessage.style.color = "red";
+                statusMessage.innerText = `Error menyimpan data: ${error.message || error}`;
+            }
+        }
+        
+        function endGame(timeout) {
+            // Display a final message to the user
+            document.getElementById("question").innerHTML = timeout ? "Waktu Habis!" : "Soal telah selesai, semua telah dikerjakan!";
+            document.querySelectorAll(".options1 button").forEach(button => button.disabled = true);
+            document.querySelector('.options1').classList.add('hidden');
+            
+            // Gabungkan semua jawaban menjadi satu string
+            const finalAnswersString = userAnswers.join(';');
+            
+            // Kirim hasil ke API
+            sendResultToApi(finalAnswersString);
+
+            // Hapus status game dari localStorage
+            localStorage.removeItem('gameEpps');
+
+            // Redirect to index.html after a delay
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 3000); // Tunggu 3 detik untuk menampilkan pesan status
+        }
+
+        // Set up the button to be initially clickable
+        window.onload = function() {
+            document.getElementById("startButton").disabled = false;
+        };
+    </script>
+</body>
+</html>

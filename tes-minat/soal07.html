@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabel Pilih Ranking</title>
+    <script>
+        if (!localStorage.getItem('user')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        p {
+            text-align: justify;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        .text-column {
+            width: 90%;
+        }
+        .button-column {
+            width: 10%;
+            text-align: center;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .button {
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .remove-button {
+            margin-left: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        #selected-rankings {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .ranking-number {
+            color: blue;
+            font-weight: bold;
+            float: right;
+            margin-right: 20px;
+        }
+        #loading-message {
+            text-align: center;
+            color: blue;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #success-message {
+            text-align: center;
+            color: green;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #error-message {
+            text-align: center;
+            color: red;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 id="quiz-title">Pilih Ranking</h2>
+        <p id="pembuka-text"></p>
+        
+        <form id="ranking-form">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-column">Tugas</th>
+                        <th class="button-column">Ranking</th>
+                    </tr>
+                </thead>
+                <tbody id="question-table-body">
+                    </tbody>
+            </table>
+        </form>
+
+        <div id="selected-rankings" style="display:none;"></div>
+        <div id="loading-message" style="display:none;">Mengirim data ke server...</div>
+        <div id="success-message" style="display:none;"></div>
+        <div id="error-message" style="display:none;"></div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closePopup()"></div>
+    <div class="popup" id="popup">
+        <h3>Pilih Ranking</h3>
+        <p id="popup-text"></p>
+        <div id="number-buttons"></div>
+        <button type="button" onclick="closePopup()">Tutup</button>
+    </div>
+
+    <script>
+        // Data pertanyaan kuis
+        const quizData = [
+            {
+                pembuka: '<strong>1.</strong> Tim mengadakan persiapan perjalanan. Rapat-rapat perlu diadakan. Dana dari sponsor, kendaraan, peralatan, dan sebagainya perlu diurus. Urutkan tugas yang paling Anda senangi dengan menuliskan nomor pilihan pada kolom di bawah &quot;Ranking&quot; Urutkan yang paling disenangi mulai dari nomor 1</p>',
+                pertanyaan: [
+                    'Menyetir mobil antar jemput para anggota yang sibuk dengan urusan, dari satu tempat ke tempat lain.',
+                    'Mempelajari cara memperbaiki kerusakan-kerusakan ringan pada mesin mobil yang siap dipakai tim.',
+                    'Merencanakan anggaran belanja proyek perjalanan yang akan diajukan kepada sponsor.',
+                    'Membaca setumpuk laporan penelitian KLH untuk memilih proyek KLH yang tepat.',
+                    'Menghadap sponsor untuk tawar-menawar dana di perusahaan "Supra Motor".',
+                    'Merancang simbol dan logo yang akan digunakan untuk peralatan tim WKN.',
+                    'Memilih berbagai khasanah lagu-lagu yang tepat bagi kampanye Kelestarian Lingkungan Hidup.',
+                    'Menyiapkan bacaan-bacaan populer KLH untuk tingkat remaja.',
+                    'Menjadi penghubung untuk kelompok-kelompok WKN lain (karena memiliki banyak tempat/kenalan).',
+                    'Mencatat hasil, menyusun, dan menyimpan arsip.',
+                    'Menyiapkan peralatan makan dan bahan makanan/perbekalan.',
+                    'Menyiapkan peralatan kedokteran, PPPK, dan obat-obatan.'
+                ]
+            },
+            {
+                pembuka: '<strong>2.</strong> Anggota yang melakukan tawar-menawar dana mengabarkan, bahwa kedua belasan Anda diminta membantu pelaksanaan \\"Bazaar Malam\\" untuk menjual barang-barang simpanan sponsor. Kedua belasan Anda akan mendapat 20% hasil penjualan sebagai tambahan bekal. Pilih sendiri tugas yang Anda senangi.',
+                pertanyaan: [
+                    'Menservis mesin diesel dan mensolder komponen panel-panel pengatur lampu iklan.',
+                    'Menghitung pengeluaran dan pemasukan bazaar (serta 20% hasil penjualannya).',
+                    'Meneliti ulat dan kutu yang telah menyerang gudang barang-barang yang akan "dibazarkan".',
+                    'Menggunakan pengeras suara untuk menarik pengunjung agar membeli.',
+                    'Merancang dan menggambar papan reklame bazaar.',
+                    'Mengubah lagu-lagu yang tepat dan memikat untuk iklan bazaar yang disiarkan melalui radio.',
+                    'Mengarang sajak-sajak jenaka untuk dibacakan guna memeriahkan acara bazaar.',
+                    'Membantu para pengunjung mengisi daftar pesanan barang yang perlu diantar ke rumah.',
+                    'Mengetik undangan khusus untuk para pejabat/jutawan.',
+                    'Memasang tenda, spanduk rumbai-rumbai, dan bendera.',
+                    'Membantu dokter melayani pengobatan cuma-cuma bagi pengunjung.',
+                    'Menjaga keamanan di halaman gedung siap dengan "halo-halo" (walky-talky).'
+                ]
+            },
+            {
+                pembuka: '<strong>3.</strong> Persiapan perjalanan mulus, perjalanan juga menyenangkan. Di Kecamatan Depok, Pak Camat meminta agar tim WKN membenahi \\"Wisma Padepokan KLH\\" tempat tim Anda menginap dan mengadakan Pameran dan Kampanye KLH. Urutkan pilihan tugas Anda.',
+                pertanyaan: [
+                    'Melakukan perhitungan biaya pembenahan wisma.',
+                    'Meneliti apakah ular-ula yang berkeliaran di wisma berbisa.',
+                    'Menghadap Pak Camat untuk meyakinkan bahwa proyek pembenahan wisma tersebut, walaupun mahal, masih seimbang dari segi manfaat.',
+                    'Menggambar sketsa tokoh-tokoh KLH.',
+                    'Membuat aransemen lagu "Lestarikan Lingkunganku" yang akan dimainkan oleh Band Musik Remaja Depok.',
+                    'Menulis puisi yang mendukung KLH untuk lomba deklamasi anak-anak/remaja Depok.',
+                    'Menyambut penduduk yang datang di Wisma untuk berdiskusi mengenai pencemaran lingkungan.',
+                    'Menyimpan arsip-arsip rekening tagihan.',
+                    'Mengecat tembok wisma.',
+                    'Mengobati penduduk Depok yang menderita gatal-gatal.',
+                    'Mengatur letak batu-batuan dalam kolam di halaman wisma.',
+                    'Memperbaiki pompa air yang macet karena lama tidak dipakai.'
+                ]
+            },
+            {
+                pembuka: '<strong>4.</strong> Kampanye di wisma direncanakan terdiri atas beberapa acara, antara lain: penghijauan, kependudukan, dan masalah polusi. Urutkan tugas-tugas yang Anda pilih.',
+                pertanyaan: [
+                    'Memeriksa unsur-unsur kimiawi air limbah yang diduga tercemar.',
+                    'Menjadi anggota utusan yang menghimbau direksi pabrik agar memperbaiki pengolahan limbah.',
+                    'Merancang/menggambar poster dan spanduk kampanye menggunakan cat minyak.',
+                    'Mengubah lagu sederhana untuk kampanye penghijauan.',
+                    'Menyiapkan kata-kata brosur dan selebaran kampanye penghijauan dan keluarga berencana.',
+                    'Memberi penjelasan kepada para pengunjung pameran.',
+                    'Mengetik naskah dan memperbanyak naskah.',
+                    'Mengatur meja, kursi, dan lemari pameran.',
+                    'Menjadi "Mantri Kesehatan" di puskesmas setempat.',
+                    'Menanamkan pohon-pohon lindung di jalur hijau.',
+                    'Merakit dan memasang pompa air bersih untuk penduduk.',
+                    'Membantu penduduk menghitung ganti rugi akibat pencemaran.'
+                ]
+            },
+            {
+                pembuka: '<strong>5.</strong> Bagi para remaja dan anak-anak, KLH diperkenalkan dengan mengadakan berbagai lomba. Urutkan pilihan Anda.',
+                pertanyaan: [
+                    'Juri lomba pidato mengenai KLH.',
+                    'Juri lomba seni merangkai bunga.',
+                    'Juri lomba menyanyi lagu daerah.',
+                    'Juri lomba merangkai kata-kata menjadi cerita KLH.',
+                    'Juri lomba Remaja putri ngetop dalam bergaul.',
+                    'Juri lomba mengetik cepat dan rapi.',
+                    'Juri lomba memasak nasi goreng paling istimewa.',
+                    'Juri lomba PPPK dan Palang Merah Remaja.',
+                    'Juri lomba voli.',
+                    'Juri lomba menambal ban sepeda.',
+                    'Juri lomba matematika murid SD.',
+                    'Juri lomba proyek observasi IPA.'
+                ]
+            },
+            {
+                pembuka: '<strong>6.</strong> Guru SD perlu mendapat pengetahuan lebih mendalam mengenai KLH. Mereka mendapat penataran, dan Anda-anda perlu menggantikan tugas mereka. Urutkan pilihan Anda.',
+                pertanyaan: [
+                    'Mengajar seni lukis dan seni patung.',
+                    'Mengajar memainkan alat musik dan menyanyi.',
+                    'Mengajar teknik dan mengarang.',
+                    'Mengajar mata pelajaran agama.',
+                    'Mengajar mengetik surat.',
+                    'Mengajar prakarya.',
+                    'Mengajar teknik merawat orang sakit.',
+                    'Mengajar olahraga dan sepak bola.',
+                    'Mengajar penggunaan alat-alat pertukangan sederhana.',
+                    'Mengajar berhitung.',
+                    'Mengajar ilmu hewan dan tumbuh-tumbuhan.',
+                    'Mengajar seluk-beluk koperasi (IPS).'
+                ]
+            },
+            {
+                pembuka: '<strong>7.</strong> Tim Anda diminta menjadi Agen rahasia untuk menyelidiki satu keluarga pedagang kaya raya yang diduga terlibat dalam masalah narkotika. Keluarga ini akan mengadakan pesta besar-besaran di salah satu pulau di Pulau Seribu. Setiap anggota tim menyamar sebagai petugas. Urutkan pilihan tugas Anda.',
+                pertanyaan: [
+                    'Menjadi pianis/gitaris dalam Band Musik.',
+                    'Menjadi "Asisten Pengarang" yang membutuhkan teks undangan berbentuk puisi yang indah.',
+                    'Menyambut tamu dan menunjukkan tempat penginapan masing-masing.',
+                    'Menjadi sekretaris yang mengetik nama tamu yang telah hadir.',
+                    'Menjadi asisten utama koki untuk tamu VIP.',
+                    'Menjadi perawat di pos kesehatan, terutama untuk penyakit gawat darurat (jantung, kecelakaan, dll).',
+                    'Menjadi petugas pengatur lalu lintas mobil-mobil jemputan.',
+                    'Menjadi diesel pembangkit listrik yang sering mogok.',
+                    'Menjadi juru bayar rekening pesta.',
+                    'Bekerja di laboratorium bahan makanan.',
+                    'Menjadi pengarah acara sambil menghimbau dermawan untuk membantu proyek KLH.',
+                    'Membuat patung besar "SELAMAT DATANG" dari tanah liat.'
+                ]
+            },
+            {
+                pembuka: '<strong>8.</strong> Di suatu daerah terjadi musibah gempa yang diikuti dengan tanah longsor yang melanda daerah pemukiman. Tim Anda diminta membantu. Urutkan tugas pilihan Anda.',
+                pertanyaan: [
+                    'Menulis karangan agar musibah ini mendapat perhatian masyarakat.',
+                    'Memenangkan mereka yang kebingungan karena terkena musibah.',
+                    'Mengetik surat jalan bagi mereka yang ingin mengungsi keluar daerah.',
+                    'Memasang tenda penampungan bagi mereka yang kehilangan tempat tinggal.',
+                    'Membantu mereka yang terluka parah.',
+                    'Membantu penggalian reruntuhan di lokasi musibah.',
+                    'Memasang kabel-kabel lampu darurat agar penggalian dapat berlangsung siang-malam.',
+                    'Menjadi kasir yang menyalurkan uang bantuan.',
+                    'Membawa berbagai peralatan untuk menyelidiki tempat-tempat yang rawan longsor.',
+                    'Menghadap para multi jutawan untuk menghimbau dana bantuan.',
+                    'Membuat gambar/patung untuk dijual oleh pencari dana.',
+                    'Ikut serta sebagai pemain band untuk mencari dana kemanusiaan.'
+                ]
+            }
+        ];
+
+        let selectedNumbers = new Array(12).fill(null);
+        let currentKolom;
+
+        // Konfigurasi API untuk menyimpan hasil
+        const API_URL = 'https://lidan-co-id.pages.dev/api/contacts_filter_dinamis';
+        const TABLE_NAME = 'nilai1';
+        const ID_TO_UPDATE = parseInt(localStorage.getItem('id_x')); // ID data yang akan di-update
+
+        // Mengirim hasil kuis ke API dengan memperbarui elemen kolom x_06.
+        async function sendResultToApi(rankingsString) {
+            const id = ID_TO_UPDATE;
+            const loadingMessage = document.getElementById("loading-message");
+            const successMessage = document.getElementById("success-message");
+            const errorMessage = document.getElementById("error-message");
+
+            loadingMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            try {
+                // Langkah 1: Ambil data yang ada dari API
+                const getUrl = `${API_URL}?table=${TABLE_NAME}&id_x_eq=${id}`;
+                console.log('Fetching existing data from URL:', getUrl);
+                const getResponse = await fetch(getUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Table-Name': TABLE_NAME
+                    }
+                });
+
+                if (!getResponse.ok) {
+                    throw new Error(`Gagal mengambil data dari API, status: ${getResponse.status}`);
+                }
+                const existingData = await getResponse.json();
+
+                if (!existingData.data || existingData.data.length === 0) {
+                    throw new Error('Data tidak ditemukan untuk ID yang diberikan.');
+                }
+
+                // Ambil nilai x_06 yang sudah ada
+                let x06 = existingData.data[0].x_06 || '';
+
+                // Langkah 2 & 3: "Explode" string, perbarui elemen berdasarkan currentKolom
+                // currentKolom 2 akan memengaruhi indeks 1, kolom 3 indeks 2, dst.
+                // Jadi, indeks yang terpengaruh adalah currentKolom - 1.
+                let x06Parts = x06.split('|');
+                const targetIndex = currentKolom - 1; // Untuk kolom 2, ini indeks 1; untuk kolom 9, ini indeks 8
+
+                // Pastikan array cukup besar untuk menampung indeks yang ditargetkan
+                while (x06Parts.length <= targetIndex) {
+                    x06Parts.push('');
+                }
+                x06Parts[targetIndex] = rankingsString;
+                let newX06Value = x06Parts.join('|');
+                
+                // Langkah 4: Siapkan data untuk permintaan PUT
+                const formData = {
+                    x_06: newX06Value
+                };
+
+                // Langkah 5: Kirim permintaan PUT ke API
+                const putUrl = `${API_URL}?table=${TABLE_NAME}&id_x=${id}`;
+                console.log('Updating data via PUT to URL:', putUrl);
+                console.log('Data to be sent:', formData);
+                
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Table-Name': TABLE_NAME
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!putResponse.ok) {
+                    const errorData = await putResponse.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${putResponse.status}`);
+                }
+
+                const data = await putResponse.json();
+                console.log('Save API response:', data);
+
+                loadingMessage.style.display = 'none';
+                successMessage.innerText = 'Data berhasil disimpan!';
+                successMessage.style.display = 'block';
+
+                // Lanjutkan ke halaman berikutnya setelah sukses
+                setTimeout(() => {
+                    const newKolom = currentKolom + 1;
+                    let nextUrl = '';
+                    if (newKolom > 9) {
+                        nextUrl = 'index.html'; 
+                    } else {
+                        nextUrl = `soal07.html?kolom=${newKolom}`;
+                    }
+                    window.location.href = nextUrl;
+                }, 1000); // Tunda sebentar untuk menampilkan pesan sukses
+                
+
+            } catch (error) {
+                console.error('Error saving data:', error);
+                loadingMessage.style.display = 'none';
+                errorMessage.innerText = `Error menyimpan data: ${error.message || error}`;
+                errorMessage.style.display = 'block';
+            }
+        }
+        
+        // Mendapatkan 'kolom' dari URL atau nilai default
+        function getKolomFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const kolom = parseInt(urlParams.get('kolom'));
+            // Kolom dalam kode asli dimulai dari 2, indeks array dimulai dari 0
+            if (isNaN(kolom) || kolom < 2 || kolom > 9) {
+                return 2;
+            }
+            return kolom;
+        }
+
+        // Memuat pertanyaan berdasarkan kolom
+        function loadQuestion() {
+            currentKolom = getKolomFromUrl();
+            const quizIndex = currentKolom - 2;
+            
+            if (quizIndex >= 0 && quizIndex < quizData.length) {
+                const quizSection = quizData[quizIndex];
+                document.getElementById('pembuka-text').innerHTML = quizSection.pembuka;
+                const tableBody = document.getElementById('question-table-body');
+                tableBody.innerHTML = '';
+                
+                quizSection.pertanyaan.forEach((question, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td id="text-${index + 1}">${question} <span id="number-${index + 1}" class="ranking-number"></span></td>
+                        <td class="button-column"><button type="button" id="button-${index + 1}" onclick="openPopup(${index + 1})">?</button></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                selectedNumbers.fill(null);
+            } else {
+                document.querySelector('.container').innerHTML = "<h2>Kuis selesai!</h2><p>Semua pertanyaan telah dijawab.</p>";
+            }
+        }
+
+        // Membuka popup untuk memilih ranking
+        function openPopup(index) {
+            const availableNumbers = Array.from({ length: 12 }, (_, i) => i + 1).filter(num => !selectedNumbers.includes(num));
+            
+            const numberButtons = document.getElementById('number-buttons');
+            numberButtons.innerHTML = '';
+            
+            availableNumbers.forEach(num => {
+                const button = document.createElement('button');
+                button.classList.add('button');
+                button.innerText = num;
+                button.onclick = () => selectNumber(num, index);
+                numberButtons.appendChild(button);
+            });
+            
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+        
+        // Menutup popup
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        // Memilih nomor ranking untuk pertanyaan
+        function selectNumber(num, index) {
+            const questionIndex = index - 1;
+
+            // Periksa apakah ada pertanyaan lain yang sudah memiliki ranking ini
+            const oldQuestionIndex = selectedNumbers.indexOf(num);
+            if (oldQuestionIndex !== -1) {
+                removeNumber(oldQuestionIndex + 1);
+            }
+            
+            // Hapus ranking lama dari pertanyaan saat ini (jika ada) sebelum menetapkan yang baru
+            if (selectedNumbers[questionIndex] !== null) {
+                removeNumber(questionIndex + 1);
+            }
+
+            // Tetapkan ranking baru ke pertanyaan saat ini
+            selectedNumbers[questionIndex] = num;
+            document.getElementById(`number-${index}`).innerText = num;
+            
+            // Perbarui UI untuk pertanyaan yang baru dipilih
+            const oldRemoveButton = document.querySelector(`#text-${index} .remove-button`);
+            if (oldRemoveButton) {
+                oldRemoveButton.remove();
+            }
+            
+            const removeButton = document.createElement('button');
+            removeButton.innerText = 'Batalkan';
+            removeButton.classList.add('remove-button');
+            removeButton.onclick = () => removeNumber(index);
+            document.getElementById(`text-${index}`).appendChild(removeButton);
+            
+            document.getElementById(`button-${index}`).style.display = 'none';
+            
+            closePopup();
+            updateSelectedRankingsDisplay();
+            checkCompletionAndSubmit();
+        }
+
+        // Membatalkan pilihan ranking
+        function removeNumber(index) {
+            const questionIndex = index - 1;
+            selectedNumbers[questionIndex] = null;
+           
+            document.getElementById(`number-${index}`).innerText = '';
+            
+            const removeButtons = document.querySelectorAll(`#text-${index} .remove-button`);
+            removeButtons.forEach(btn => btn.remove());
+            
+            document.getElementById(`button-${index}`).style.display = 'block';
+
+            updateSelectedRankingsDisplay();
+        }
+
+        // Memperbarui tampilan ranking yang telah dipilih
+        function updateSelectedRankingsDisplay() {
+            const rankings = selectedNumbers.filter(num => num !== null);
+            const rankingsDiv = document.getElementById('selected-rankings');
+            if (rankings.length > 0) {
+                rankingsDiv.innerText = `Ranking yang dipilih: ${rankings.join('; ')}`;
+                rankingsDiv.style.display = 'block';
+            } else {
+                rankingsDiv.style.display = 'none';
+            }
+        }
+        
+        // Memeriksa apakah semua ranking sudah dipilih dan otomatis mengirim jawaban
+        function checkCompletionAndSubmit() {
+            const rankings = selectedNumbers.filter(num => num !== null);
+            if (rankings.length === 12) {
+                submitRankings();
+            }
+        }
+
+        // Mengirim jawaban dan beralih ke halaman berikutnya
+        function submitRankings() {
+            const rankingsString = selectedNumbers.filter(num => num !== null).join('; ');
+            localStorage.setItem(`Soal-${currentKolom}-Rankings`, rankingsString);
+            
+            // Panggil fungsi sendResultToApi di sini
+            sendResultToApi(rankingsString);
+
+            // Perintah untuk pindah halaman akan ada di dalam sendResultToApi setelah data berhasil dikirim
+            // const newKolom = currentKolom + 1;
+            // let nextUrl = '';
+            // if (newKolom > 9) {
+            //     nextUrl = 'index.html'; 
+            // } else {
+            //     nextUrl = `soal07.html?kolom=${newKolom}`;
+            // }
+            // window.location.href = nextUrl;
+        }
+        
+        // Memuat pertanyaan awal saat halaman dimuat
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
