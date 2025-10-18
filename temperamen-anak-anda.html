@@ -650,5 +650,192 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="js/script.js"></script>
+    <script>
+/**
+ * Pelacak Kunjungan Harian Unik menggunakan Local Storage, dengan kunci unik per URL.
+ * Fungsionalitas: POST (baru) atau PUT (update x_03) tanpa GET, sesuai logika terakhir yang berhasil.
+ * CATATAN: Fungsi tanggal dan waktu telah dimodifikasi agar selalu menggunakan Waktu Lokal (WIB/Asia Jakarta)
+ * untuk menghindari perbedaan tanggal 17 vs 18 yang disebabkan oleh UTC.
+ */
+(function () {
+    const API_BASE_URL = "https://lidan-co-id.pages.dev/api/contacts";
+    const TABLE_NAME = "kunjungan";
+    const BASE_LS_KEY = "visit_tracker_"; // Prefix kunci Local Storage
+    const QUERY_PARAM = `tabel=${TABLE_NAME}`;
+
+    /** Helper untuk membuat hash sederhana dari string (URL) */
+    function simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash |= 0; // Convert to 32bit integer
+        }
+        // Mengubah ke hex string untuk menghindari karakter yang tidak valid
+        return Math.abs(hash).toString(16); 
+    }
+
+    /** Helper untuk mendapatkan tanggal hari ini dalam format YYYY-MM-DD (LOKAL) */
+    function getTodayDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        // getMonth() adalah 0-indexed, jadi harus ditambah 1
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // *** FUNGSI DIPERBAIKI: Menggunakan Komponen Waktu Lokal ***
+    /** Helper untuk mendapatkan timestamp saat ini (LOKAL: Asia/Jakarta) */
+    function getCurrentTimestamp() {
+        const now = new Date();
+        
+        // Ambil komponen tanggal lokal
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        
+        // Ambil komponen waktu lokal
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+        const second = String(now.getSeconds()).padStart(2, '0');
+        
+        // Format sebagai YYYY-MM-DD HH:MM:SS (WIB/Lokal)
+        return `${year}-${month}-${day} ${hour}:${minute}:${second}`; 
+    }
+
+    async function trackVisit() {
+        const currentUrl = window.location.href;
+        // Kunci Local Storage sekarang unik untuk setiap URL
+        const LOCAL_STORAGE_KEY = BASE_LS_KEY + simpleHash(currentUrl); 
+        
+        console.log("--- Memulai Pelacakan Kunjungan ---");
+        console.log(`Kunci LS yang digunakan: ${LOCAL_STORAGE_KEY}`);
+
+        const today = getTodayDate();
+        const storedDataRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
+        let storedData = null;
+
+        try {
+            storedData = storedDataRaw ? JSON.parse(storedDataRaw) : null;
+        } catch (e) {
+            console.error("❌ Gagal parse data Local Storage untuk URL ini:", e);
+            storedData = null; 
+        }
+
+        // isNewVisit = true jika LS untuk URL ini kosong atau tanggal sudah berbeda hari
+        const isNewVisit = !storedData || storedData.date !== today;
+        console.log(`[STATUS] Tanggal Hari Ini (Lokal): ${today}. Kunjungan Baru Hari Ini untuk URL ini: ${isNewVisit ? 'YA' : 'TIDAK'}.`);
+
+        if (isNewVisit) {
+            // ===================================
+            // KUNJUNGAN BARU (CREATE - POST)
+            // ===================================
+            console.log("➡️ Kunjungan Unik Baru untuk URL ini. Melakukan POST...");
+
+            // Menggunakan waktu lokal untuk timestamp
+            const currentTimestamp = getCurrentTimestamp(); 
+
+            const postData = {
+                x_01: currentUrl, // Simpan URL lengkap
+                x_02: '1', 
+                x_03: '1', // Nilai awal adalah 1
+                x_20: currentTimestamp, // Waktu dibuat (Lokal)
+                x_19: currentTimestamp, // Waktu terakhir diupdate (Lokal)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}?${QUERY_PARAM}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Table-Name': TABLE_NAME,
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API POST gagal dengan status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const newId = result.id_x || (result.data ? result.data.id_x : null); 
+
+                if (newId) {
+                    // Simpan data di Local Storage dengan kunci URL yang unik
+                    const newStoredData = {
+                        id_x: newId,
+                        x_02: '1', 
+                        x_03: '1', 
+                        date: today, // Tanggal lokal
+                        initial_url: currentUrl,
+                        x_19: currentTimestamp, // Simpan juga timestamp lokal di LS
+                        // Kunci yang mengidentifikasi pelacakan ini
+                        ls_key_hash: simpleHash(currentUrl) 
+                    };
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newStoredData));
+                    console.log(`✅ POST berhasil. ID tersimpan di LS: ${newId}.`);
+                } else {
+                    console.error("⚠️ POST berhasil, tetapi tidak ditemukan id_x dalam respons.");
+                }
+
+            } catch (error) {
+                console.error("❌ Gagal melakukan POST ke API:", error);
+            }
+
+        } else {
+            // ===================================
+            // KUNJUNGAN BERULANG (UPDATE - PUT)
+            // ===================================
+            const idToUpdate = storedData.id_x;
+            const currentVisitCount = parseInt(storedData.x_03, 10) || 0;
+            const newVisitCount = currentVisitCount + 1;
+            
+            // Menggunakan waktu lokal baru untuk update
+            const newTimestamp = getCurrentTimestamp(); 
+
+            console.log(`➡️ Kunjungan Berulang untuk URL ini (id_x: ${idToUpdate}).`);
+            console.log(`   [HITUNG] x_03 dari LS: ${currentVisitCount}. Akan diupdate menjadi: ${newVisitCount}.`);
+            console.log(`   [WAKTU] x_19 diupdate menjadi: ${newTimestamp}.`);
+            
+            try {
+                // 1. Update Local Storage
+                storedData.x_03 = String(newVisitCount);
+                storedData.x_19 = newTimestamp; // Update dengan timestamp lokal yang baru
+
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(storedData));
+                console.log(`   ✅ Local Storage diupdate: x_03 = ${newVisitCount}.`);
+                
+                // 2. Lakukan PUT dengan nilai x_03 dan x_19 yang baru
+                const putData = {
+                    x_03: storedData.x_03, 
+                    x_19: storedData.x_19, 
+                };
+
+                const putResponse = await fetch(`${API_BASE_URL}/${idToUpdate}?${QUERY_PARAM}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Table-Name': TABLE_NAME,
+                    },
+                    body: JSON.stringify(putData)
+                });
+
+                if (!putResponse.ok) {
+                    throw new Error(`API PUT gagal dengan status: ${putResponse.status}`);
+                }
+
+                console.log(`✅ PUT berhasil untuk id_x: ${idToUpdate}. Counter x_03 di-update menjadi: ${newVisitCount}.`);
+
+            } catch (error) {
+                console.error("❌ Gagal melakukan PUT ke API:", error);
+            }
+        }
+        console.log("--- Pelacakan Kunjungan Selesai ---");
+    }
+
+    trackVisit();
+})();
+    </script>
 </body>
 </html>
